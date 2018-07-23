@@ -1,4 +1,28 @@
 
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2018 Daniel Moch
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
 # Copyright (c) 2014 Eric Davis
 # This file is *heavily* modified from nvpy.
 
@@ -8,9 +32,9 @@
 
 import os, time, re, glob, json, copy, threading
 from . import utils
-from . import simplenote
-simplenote.NOTE_FETCH_LENGTH=100
-from .simplenote import Simplenote
+from . import nnotes
+nnotes.NOTE_FETCH_LENGTH=100
+from .nnotes import NextcloudNote
 import logging
 
 class ReadError(RuntimeError):
@@ -63,11 +87,11 @@ class NotesDB():
                 # add the note to our database
                 self.notes[localkey] = n
 
-        # initialise the simplenote instance we're going to use
+        # initialise the NextCloud instance we're going to use
         # this does not yet need network access
-        self.simplenote = Simplenote(self.config.get_config('sn_username'),
-                                     self.config.get_config('sn_password'),
-                                     self.config.get_config('sn_host'))
+        self.note = NextcloudNote(self.config.get_config('nn_username'),
+                                  self.config.get_config('nn_password'),
+                                  self.config.get_config('nn_host'))
 
         # we'll use this to store which notes are currently being synced by
         # the background thread, so we don't add them anew if they're still
@@ -439,28 +463,17 @@ class NotesDB():
     def sync_notes(self, server_sync=True, full_sync=True):
         """Perform a full bi-directional sync with server.
 
-        This follows the recipe in the SimpleNote 2.0 API documentation.
-        After this, it could be that local keys have been changed, so
-        reset any views that you might have!
-
-        From Simplenote API v2.1.3...
-
-        To check for changes you can use 'syncnum' and 'version'. 'syncnum' will
-        increment whenever there is any change to a note, content change, tag
-        change, etc. 'version' will increment whenever the content property is
-        changed. You should store both these numbers in your client to track
-        changes and determine when a note needs to be updated or saved.
-
         Psuedo-code algorithm for syncing:
 
             1. for any note changed locally, including new notes:
                    save note to server, update note with response
-                   // (new syncnum, version, possible newly-merged content)
+                   (new title, modified, title, category, content,
+                    favorite)
 
-            2. get the note index
+            2. get all notes
 
             3. for each remote note
-                   if remote syncnum > local syncnum ||
+                   if remote modified > local modified ||
                       a new note and key is not in local store
                        retrieve note, update note with response
 
@@ -525,7 +538,7 @@ class NotesDB():
                         del cn['content']
                     del cn['what_changed']
 
-                uret = self.simplenote.update_note(cn)
+                uret = self.note.update_note(cn)
 
                 if uret[1] == 0: # success
                     # if this is a new note our local key is not valid anymore
@@ -554,7 +567,7 @@ class NotesDB():
         if not server_sync:
             nl = []
         else:
-            nl = self.simplenote.get_note_list(since=None if full_sync else self.last_sync)
+            nl = self.note.get_note_list(since=None if full_sync else self.last_sync)
 
             if nl[1] == 0:  # success
                 nl = nl[0]
@@ -579,7 +592,7 @@ class NotesDB():
                     # we already have this note
                     # if the server note has a newer syncnum we need to get it
                     if int(n.get('syncnum')) > int(self.notes[k].get('syncnum', -1)):
-                        gret = self.simplenote.get_note(k)
+                        gret = self.note.get_note(k)
                         if gret[1] == 0:
                             self.notes[k].update(gret[0])
                             local_updates[k] = True
@@ -592,7 +605,7 @@ class NotesDB():
                             sync_errors += 1
                 else:
                     # this is a new note
-                    gret = self.simplenote.get_note(k)
+                    gret = self.note.get_note(k)
                     if gret[1] == 0:
                         self.notes[k] = gret[0]
                         local_updates[k] = True
@@ -641,7 +654,7 @@ class NotesDB():
         return sync_errors
 
     def get_note_version(self, key, version):
-        gret = self.simplenote.get_note(key, version)
+        gret = self.note.get_note(key, version)
         return gret[0] if gret[1] == 0 else None
 
     def get_note_status(self, key):

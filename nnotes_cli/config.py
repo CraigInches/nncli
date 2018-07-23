@@ -150,9 +150,9 @@ class Config:
         # ordered dicts used to ease help
 
         self.configs = collections.OrderedDict()
-        self.configs['sn_username'] = [ cp.get(cfg_sec, 'cfg_sn_username', raw=True), 'Simplenote Username' ]
-        self.configs['sn_password'] = [ sn_password, 'Simplenote Password' ]
-        self.configs['sn_host'] = [ cp.get(cfg_sec, 'cfg_sn_host', raw=True), 'Simplenote server hostname' ]
+        self.configs['nn_username'] = [ cp.get(cfg_sec, 'cfg_nn_username', raw=True), 'NextCloud Username' ]
+        self.configs['nn_password'] = [ nn_password, 'NextCloud Password' ]
+        self.configs['nn_host'] = [ cp.get(cfg_sec, 'cfg_nn_host', raw=True), 'NextCloud server hostname' ]
         self.configs['db_path'] = [ cp.get(cfg_sec, 'cfg_db_path'), 'Note storage path' ]
         self.configs['search_tags'] = [ cp.get(cfg_sec, 'cfg_search_tags'), 'Search tags as well' ]
         self.configs['sort_mode'] = [ cp.get(cfg_sec, 'cfg_sort_mode'), 'Sort mode' ]

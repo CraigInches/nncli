@@ -1,3 +1,26 @@
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2018 Daniel Moch
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
 # Copyright (c) 2014 Eric Davis
 # This file is *heavily* modified from nvpy.
@@ -122,19 +145,21 @@ def note_markdown(n):
         return 0
     return 1 if 'markdown' in asystags else 0
 
+# TODO: NextCloud notes doesn't have a concept of tags, but it does
+# allow assignment of notes to a single category. Refactor to take this
+# into account
 tags_illegal_chars = re.compile(r'[\s]')
 def sanitise_tags(tags):
     """
     Given a string containing comma-separated tags, sanitise and return a list of string tags.
 
-    The simplenote API doesn't allow for spaces, so we strip those out.
+    The NextCloud API doesn't allow for spaces, so we strip those out.
 
     @param tags: Comma-separated tags, one string.
     @returns: List of strings.
     """
-
     # hack out all kinds of whitespace, then split on ,
-    # if you run into more illegal characters (simplenote does not want to sync them)
+    # if you run into more illegal characters (NextCloud does not want to sync them)
     # add them to the regular expression above.
     illegals_removed = tags_illegal_chars.sub('', tags)
     if len(illegals_removed) == 0:

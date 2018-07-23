@@ -1,14 +1,38 @@
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2018 Daniel Moch
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
 # Copyright (c) 2014 Eric Davis
 # This file is *slightly* modified from simplynote.py.
 
 # -*- coding: utf-8 -*-
 """
-    simplenote.py
+    nnotes.py
     ~~~~~~~~~~~~~~
 
-    Python library for accessing the Simplenote API
+    Python library for accessing the NextCloud Notes API (v0.2)
 
+    Modified from simplnote.py
     :copyright: (c) 2011 by Daniel Schauenberg
     :license: MIT, see LICENSE for more details.
 """
@@ -32,11 +56,11 @@ except ImportError:
 
 NOTE_FETCH_LENGTH = 100
 
-class SimplenoteLoginFailed(Exception):
+class NextcloudLoginFailed(Exception):
     pass
 
-class Simplenote(object):
-    """ Class for interacting with the simplenote web service """
+class NextcloudNote(object):
+    """ Class for interacting with the NextCloud Notes web service """
 
     def __init__(self, username, password, host):
         """ object constructor """
@@ -49,14 +73,14 @@ class Simplenote(object):
         self.status = 'offline'
 
     def authenticate(self, user, password):
-        """ Method to get simplenote auth token
+        """ Method to get NextCloud Notes auth token
 
         Arguments:
-            - user (string):     simplenote email address
-            - password (string): simplenote password
+            - user (string):     NextCloud username
+            - password (string): NextCloud password
 
         Returns:
-            Simplenote API token as string
+            NextCloud API token as string
 
         """
         auth_params = "email=%s&password=%s" % (user, password)
@@ -86,7 +110,7 @@ class Simplenote(object):
         is `None` a new one is requested and returned.
 
         Returns:
-            Simplenote API token as string
+            NextCloud API token as string
 
         """
         if self.token is None:

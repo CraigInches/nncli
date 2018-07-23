@@ -150,10 +150,10 @@ class ViewTitles(urwid.ListBox):
             cur   = self.focus_position
             total = len(self.body.positions())
 
-        hdr = 'Simplenote'
+        hdr = 'NextCloud Notes'
 
-        # include simplenote connection status in header
-        hdr += ' (' + self.ndb.simplenote.status + ')'
+        # include  connection status in header
+        hdr += ' (' + self.ndb.note.status + ')'
 
         if self.search_string != None:
             hdr += ' - Search: ' + self.search_string

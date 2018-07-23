@@ -8,7 +8,7 @@ import copy, json, urwid, datetime
 from . import view_titles, view_note, view_help, view_log, user_input
 from . import utils, temp
 from .config import Config
-from .simplenote import Simplenote
+from .nnotes import NextcloudNote
 from .notes_db import NotesDB, ReadError, WriteError
 from logging.handlers import RotatingFileHandler
 
