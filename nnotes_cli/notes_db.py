@@ -81,7 +81,7 @@ class NotesDB():
                 n['savedate'] = now
                 # set a localkey to each note in memory
                 # Note: 'key' is used only for syncing with server - 'localkey'
-                #       is used for everything else in sncli
+                #       is used for everything else in nncli
                 n['localkey'] = localkey
 
                 # add the note to our database

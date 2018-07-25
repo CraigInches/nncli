@@ -1,3 +1,26 @@
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2018 Daniel Moch
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
 # Copyright (c) 2014 Eric Davis
 # Licensed under the MIT License
@@ -12,7 +35,7 @@ from .nnotes import NextcloudNote
 from .notes_db import NotesDB, ReadError, WriteError
 from logging.handlers import RotatingFileHandler
 
-class sncli:
+class nncli:
 
     def __init__(self, do_server_sync, verbose=False, config_file=None):
         self.config         = Config(config_file)
@@ -31,7 +54,7 @@ class sncli:
             force_full_sync = True
 
         # configure the logging module
-        self.logfile = os.path.join(self.config.get_config('db_path'), 'sncli.log')
+        self.logfile = os.path.join(self.config.get_config('db_path'), 'nncli.log')
         self.loghandler = RotatingFileHandler(self.logfile, maxBytes=100000, backupCount=1)
         self.loghandler.setLevel(logging.DEBUG)
         self.loghandler.setFormatter(logging.Formatter(fmt='%(asctime)s [%(levelname)s] %(message)s'))
@@ -40,7 +63,7 @@ class sncli:
         self.logger.addHandler(self.loghandler)
         self.config.logfile = self.logfile
 
-        logging.debug('sncli logging initialized')
+        logging.debug('nncli logging initialized')
 
         self.logs = []
 
@@ -56,7 +79,7 @@ class sncli:
             # with hundreds of notes will cause a recursion panic under
             # urwid. This simple workaround gets the job done. :-)
             self.verbose = True
-            self.log('sncli database doesn\'t exist, forcing full sync...')
+            self.log('nncli database doesn\'t exist, forcing full sync...')
             self.sync_notes()
             self.verbose = verbose
 
@@ -168,11 +191,11 @@ class sncli:
 
     def gui_header_clear(self):
         self.master_frame.contents['header'] = ( None, None )
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_header_set(self, w):
         self.master_frame.contents['header'] = ( w, None )
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_header_get(self):
         return self.master_frame.contents['header'][0]
@@ -184,13 +207,13 @@ class sncli:
         ui = self.gui_footer_input_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([ urwid.Pile([]), urwid.Pile([ui]) ]), None)
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_footer_log_set(self, pl):
         ui = self.gui_footer_input_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([ urwid.Pile(pl), urwid.Pile([ui]) ]), None)
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_footer_log_get(self):
         return self.master_frame.contents['footer'][0].contents[0][0]
@@ -199,13 +222,13 @@ class sncli:
         pl = self.gui_footer_log_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([ urwid.Pile([pl]), urwid.Pile([]) ]), None)
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_footer_input_set(self, ui):
         pl = self.gui_footer_log_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([ urwid.Pile([pl]), urwid.Pile([ui]) ]), None)
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_footer_input_get(self):
         return self.master_frame.contents['footer'][0].contents[1][0]
@@ -216,12 +239,12 @@ class sncli:
 
     def gui_body_clear(self):
         self.master_frame.contents['body'] = ( None, None )
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_body_set(self, w):
         self.master_frame.contents['body'] = ( w, None )
         self.gui_update_status_bar()
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.draw_screen()
 
     def gui_body_get(self):
         return self.master_frame.contents['body'][0]
@@ -276,7 +299,7 @@ class sncli:
         if self.verbose:
             self.gui_footer_log_set(log_pile)
 
-        self.sncli_loop.set_alarm_in(
+        self.nncli_loop.set_alarm_in(
                 int(self.config.get_config('log_timeout')),
                 self.log_timeout, None)
 
@@ -916,12 +939,12 @@ class sncli:
         self.thread_sync.start()
 
     def gui_clear(self):
-        self.sncli_loop.widget = urwid.Filler(urwid.Text(''))
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.widget = urwid.Filler(urwid.Text(''))
+        self.nncli_loop.draw_screen()
 
     def gui_reset(self):
-        self.sncli_loop.widget = self.master_frame
-        self.sncli_loop.draw_screen()
+        self.nncli_loop.widget = self.master_frame
+        self.nncli_loop.draw_screen()
 
     def gui_stop(self):
         # don't exit if there are any notes not yet saved to the disk
@@ -1044,14 +1067,14 @@ class sncli:
                                                             urwid.Pile([]) ]),
                                         focus_part='body')
 
-        self.sncli_loop = urwid.MainLoop(self.master_frame,
+        self.nncli_loop = urwid.MainLoop(self.master_frame,
                                          palette,
                                          handle_mouse=False)
 
-        self.sncli_loop.set_alarm_in(0, self.gui_init_view,
+        self.nncli_loop.set_alarm_in(0, self.gui_init_view,
                                      True if key else False)
 
-        self.sncli_loop.run()
+        self.nncli_loop.run()
 
     def cli_list_notes(self, regex, search_string):
 
@@ -1280,7 +1303,7 @@ signal.signal(signal.SIGINT, SIGINT_handler)
 def usage():
     print ('''
 Usage:
- sncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
+ nncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
 
  OPTIONS:
   -h, --help                  - usage help
@@ -1289,7 +1312,8 @@ Usage:
   -r, --regex                 - search string is a regular expression
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
-  -c <file>, --config=<file>  - config file to read from (defaults to ~/.snclirc)
+  -c <file>, --config=<file>  - config file to read from (defaults to 
+                                ~/.config/nncli/config)
 
  COMMANDS:
   <none>                      - console gui mode when no command specified
@@ -1348,25 +1372,25 @@ def main(argv=sys.argv[1:]):
             usage()
 
     if not args:
-        sncli(sync, verbose, config).gui(key)
+        nncli(sync, verbose, config).gui(key)
         return
 
-    def sncli_start(sync=sync, verbose=verbose, config=config):
-        sn = sncli(sync, verbose, config)
+    def nncli_start(sync=sync, verbose=verbose, config=config):
+        sn = nncli(sync, verbose, config)
         if sync: sn.sync_notes()
         return sn
 
     if args[0] == 'sync':
-        sn = sncli_start(True)
+        sn = nncli_start(True)
 
     elif args[0] == 'list':
 
-        sn = sncli_start()
+        sn = nncli_start()
         sn.cli_list_notes(regex, ' '.join(args[1:]))
 
     elif args[0] == 'dump':
 
-        sn = sncli_start()
+        sn = nncli_start()
         if key:
             sn.cli_note_dump(key)
         else:
@@ -1375,10 +1399,10 @@ def main(argv=sys.argv[1:]):
     elif args[0] == 'create':
 
         if len(args) == 1:
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_create(False, title)
         elif len(args) == 2 and args[1] == '-':
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_create(True, title)
         else:
             usage()
@@ -1386,17 +1410,17 @@ def main(argv=sys.argv[1:]):
     elif args[0] == 'import':
 
         if len(args) == 1:
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_import(False)
         elif len(args) == 2 and args[1] == '-':
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_import(True)
         else:
             usage()
 
     elif args[0] == 'export':
 
-        sn = sncli_start()
+        sn = nncli_start()
         if key:
             sn.cli_note_export(key)
         else:
@@ -1407,7 +1431,7 @@ def main(argv=sys.argv[1:]):
         if not key:
             usage()
 
-        sn = sncli_start()
+        sn = nncli_start()
         sn.cli_note_edit(key)
 
     elif args[0] == 'trash' or args[0] == 'untrash':
@@ -1415,7 +1439,7 @@ def main(argv=sys.argv[1:]):
         if not key:
             usage()
 
-        sn = sncli_start()
+        sn = nncli_start()
         sn.cli_note_trash(key, 1 if args[0] == 'trash' else 0)
 
     elif args[0] == 'pin' or args[0] == 'unpin':
@@ -1423,7 +1447,7 @@ def main(argv=sys.argv[1:]):
         if not key:
             usage()
 
-        sn = sncli_start()
+        sn = nncli_start()
         sn.cli_note_pin(key, 1 if args[0] == 'pin' else 0)
 
     elif args[0] == 'markdown' or args[0] == 'unmarkdown':
@@ -1431,7 +1455,7 @@ def main(argv=sys.argv[1:]):
         if not key:
             usage()
 
-        sn = sncli_start()
+        sn = nncli_start()
         sn.cli_note_markdown(key, 1 if args[0] == 'markdown' else 0)
 
     # Tag API
@@ -1448,7 +1472,7 @@ def main(argv=sys.argv[1:]):
 
         if args[1] == 'get':
 
-            sn = sncli_start()
+            sn = nncli_start()
             tags = sn.cli_note_tags_get(key)
             if tags:
                 print(tags)
@@ -1456,19 +1480,19 @@ def main(argv=sys.argv[1:]):
         elif args[1] == 'set':
 
             tags = args[2]
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_tags_set(key, tags)
 
         elif args[1] == 'add':
 
             new_tags = args[2]
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_tags_add(key, new_tags)
 
         elif args[1] == 'rm':
 
             rm_tags = args[2]
-            sn = sncli_start()
+            sn = nncli_start()
             sn.cli_note_tags_rm(key, rm_tags)
 
     else:

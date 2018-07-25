@@ -21,7 +21,7 @@ setup(
       packages=['simplenote_cli'],
       entry_points={
           'console_scripts': [
-              'sncli = simplenote_cli.sncli:main'
+              'nncli = nnotes_cli.nncli:main'
           ]
       },
       classifiers=[

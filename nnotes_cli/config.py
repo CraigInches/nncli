@@ -1,3 +1,26 @@
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2018 Daniel Moch
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 
 # Copyright (c) 2014 Eric Davis
 # Licensed under the MIT License
@@ -8,11 +31,31 @@ class Config:
 
     def __init__(self, custom_file=None):
         self.home = os.path.abspath(os.path.expanduser('~'))
+        if 'XDG_CONFIG_HOME' in os.environ.keys():
+            self.config_home = \
+                    os.path.join(os.environ['XDG_CONFIG_HOME'], 'nncli')
+        else:
+            self.config_home = \
+                    os.path.join(
+                            os.path.expanduser('~'),
+                            '.config',
+                            'nncli'
+                            )
+        if 'XDG_CACHE_HOME' in os.environ.keys():
+            self.cache_home = \
+                    os.path.join(os.environ['XDG_CACHE_HOME'], 'nncli')
+        else:
+            self.cache_home = \
+                    os.path.join(
+                            os.path.expanduser('~'),
+                            '.cache',
+                            'nncli'
+                            )
         defaults = \
         {
-         'cfg_sn_username'       : '',
-         'cfg_sn_password'       : '',
-         'cfg_db_path'           : os.path.join(self.home, '.sncli'),
+         'cfg_nn_username'       : '',
+         'cfg_nn_password'       : '',
+         'cfg_db_path'           : self.cache_home,
          'cfg_search_tags'       : 'yes',  # with regex searches
          'cfg_sort_mode'         : 'date', # 'alpha' or 'date'
          'cfg_pinned_ontop'      : 'yes',
@@ -26,7 +69,7 @@ class Config:
          'cfg_max_logs'          : '5',
          'cfg_log_timeout'       : '5',
          'cfg_log_reversed'      : 'yes',
-         'cfg_sn_host'           : 'simple-note.appspot.com',
+         'cfg_nn_host'           : '',
          'cfg_tempdir'           : '',
 
          'kb_help'            : 'h',
@@ -125,23 +168,23 @@ class Config:
         if custom_file is not None:
             self.configs_read = cp.read([custom_file])
         else:
-            self.configs_read = cp.read([os.path.join(self.home, '.snclirc')])
+            self.configs_read = cp.read([os.path.join(self.config_home, 'config')])
 
-        cfg_sec = 'sncli'
+        cfg_sec = 'nncli'
 
         if not cp.has_section(cfg_sec):
             cp.add_section(cfg_sec)
 
 
         # special handling for password so we can retrieve it by running a command
-        sn_password = cp.get(cfg_sec, 'cfg_sn_password', raw=True)
-        if not sn_password:
-            command = cp.get(cfg_sec, 'cfg_sn_password_eval', raw=True)
+        nn_password = cp.get(cfg_sec, 'cfg_nn_password', raw=True)
+        if not nn_password:
+            command = cp.get(cfg_sec, 'cfg_nn_password_eval', raw=True)
             if command:
                 try:
-                    sn_password = subprocess.check_output(command, shell=True, universal_newlines=True)
+                    nn_password = subprocess.check_output(command, shell=True, universal_newlines=True)
                     # remove trailing newlines to avoid requiring butchering shell commands (they can't usually be in passwords anyway)
-                    sn_password = sn_password.rstrip('\n')
+                    nn_password = nn_password.rstrip('\n')
                 except subprocess.CalledProcessError as e:
                     print('Error evaluating command for password.')
                     print(e)

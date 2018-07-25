@@ -72,23 +72,16 @@ Check your OS distribution for installation packages.
   - flag note as markdown or not
   - view and edit note tags
 
-### Screenshots
-
-![nncli](https://github.com/insanum/nncli/raw/master/screenshots/screenshot1.png)
-![nncli](https://github.com/insanum/nncli/raw/master/screenshots/screenshot2.png)
-![nncli](https://github.com/insanum/nncli/raw/master/screenshots/screenshot3.png)
-![nncli](https://github.com/insanum/nncli/raw/master/screenshots/screenshot4.png)
-
 ### HowTo
 
 ``` Usage: nncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
 
  OPTIONS: -h, --help                  - usage help -v, --verbose
  - verbose output -n, --nosync                - don't perform a server
- sync -r, --regex                 - search string is a regular
- expression -k <key>, --key=<key>       - note key -t <title>,
- --title=<title> - title of note for create (cli mode) -c <file>,
- --config=<file>  - config file to read from (defaults to ~/.nnclirc)
+   sync -r, --regex                 - search string is a regular
+   expression -k <key>, --key=<key>       - note key -t <title>,
+   --title=<title> - title of note for create (cli mode) -c <file>,
+   --config=<file>  - config file to read from (defaults to ~/.nnclirc)
 
  COMMANDS: <none>                      - console gui mode when no
  command specified sync                        - perform a full sync
@@ -111,9 +104,9 @@ Check your OS distribution for installation packages.
 
 #### Configuration
 
-The current NextCloud Notes API does not support oauth authentication so your
-NextCloud Notes account information must live in the configuration file.
-Please be sure to protect this file.
+The current NextCloud Notes API does not support oauth authentication so
+your NextCloud Notes account information must live in the configuration
+file.  Please be sure to protect this file.
 
 nncli pulls in configuration from the `.nnclirc` file located in your
 $HOME directory. At the very least, the following example `.nnclirc`
