@@ -59,7 +59,7 @@ def get_note_tags(note):
 #   'm' - markdown
 def get_note_flags(note):
     flags = ''
-    flags += 'X' if float(note['modifydate']) > float(note['syncdate']) else ' '
+    flags += 'X' if float(note['modified']) > float(note['syncdate']) else ' '
     flags += 'T' if 'deleted' in note and note['deleted'] else ' '
     if 'systemtags' in note:
         flags += '*' if 'pinned'    in note['systemtags'] else ' '
@@ -180,9 +180,9 @@ def sort_notes_by_tags(notes, pinned_ontop=False):
 
 def sort_by_modify_date_pinned(a):
     if note_pinned(a.note):
-        return 100.0 * float(a.note.get('modifydate', 0))
+        return 100.0 * float(a.note.get('modified', 0))
     else:
-        return float(a.note.get('modifydate', 0))
+        return float(a.note.get('modified', 0))
 
 class KeyValueObject:
     """Store key=value pairs in this object and retrieve with o.key.

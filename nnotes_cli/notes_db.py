@@ -1,4 +1,3 @@
-
 #
 # The MIT License (MIT)
 #
@@ -73,14 +72,15 @@ class NotesDB():
             except ValueError as e:
                 raise ReadError ('Error reading {0}: {1}'.format(fn, str(e)))
             else:
-                # we always have a localkey, also when we don't have a note['key'] yet (no sync)
+                # we always have a localkey, also when we don't have a
+                # note['id'] yet (no sync)
                 localkey = n.get('localkey', os.path.splitext(os.path.basename(fn))[0])
                 # we maintain in memory a timestamp of the last save
                 # these notes have just been read, so at this moment
                 # they're in sync with the disc.
                 n['savedate'] = now
                 # set a localkey to each note in memory
-                # Note: 'key' is used only for syncing with server - 'localkey'
+                # Note: 'id' is used only for syncing with server - 'localkey'
                 #       is used for everything else in nncli
                 n['localkey'] = localkey
 
@@ -103,7 +103,7 @@ class NotesDB():
             if self.config.get_config('pinned_ontop') == 'yes':
                 filtered_notes.sort(key=utils.sort_by_modify_date_pinned, reverse=True)
             else:
-                filtered_notes.sort(key=lambda o: -float(o.note.get('modifydate', 0)))
+                filtered_notes.sort(key=lambda o: -float(o.note.get('modified', 0)))
         elif sort_mode == 'alpha':
             if self.config.get_config('pinned_ontop') == 'yes':
                 filtered_notes.sort(key=utils.sort_by_title_pinned)
@@ -298,28 +298,27 @@ class NotesDB():
     def import_note(self, note):
         # need to get a key unique to this database. not really important
         # what it is, as long as it's unique.
-        new_key = note['key'] if note.get('key') else utils.generate_random_key()
+        new_key = note['id'] if note.get('id') else utils.generate_random_key()
         while new_key in self.notes:
             new_key = utils.generate_random_key()
 
         timestamp = time.time()
 
         try:
-            modifydate = float(note.get('modifydate', timestamp))
+            modified = float(note.get('modified', timestamp))
             createdate = float(note.get('createdate', timestamp))
         except ValueError:
             raise ValueError('date fields must be numbers or string representations of numbers')
 
         # note has no internal key yet.
         new_note = {
-                    'content'    : note.get('content', ''),
-                    'deleted'    : note.get('deleted', 0),
-                    'modifydate' : modifydate,
-                    'createdate' : createdate,
+                    'content'  : note.get('content', ''),
+                    'modified' : modified,
+                    'title'    : note.get('title'),
+                    'category' : note.get('category', None),
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
-                    'tags'       : note.get('tags', []),
-                    'systemtags' : note.get('systemtags', [])
+                    'favorite' : False
                    }
 
         # sanity check all note values
@@ -328,7 +327,7 @@ class NotesDB():
         if not new_note['deleted'] in (0, 1):
             raise ValueError('"deleted" must be 0 or 1')
 
-        for n in (new_note['modifydate'], new_note['createdate']):
+        for n in (new_note['modified']):
             if not 0 <= n <= timestamp:
                 raise ValueError('date fields must be real')
 
@@ -359,14 +358,14 @@ class NotesDB():
 
         # note has no internal key yet.
         new_note = {
-                    'localkey'   : new_key,
-                    'content'    : content,
-                    'deleted'    : 0,
-                    'modifydate' : timestamp,
-                    'createdate' : timestamp,
+                    'localkey' : new_key,
+                    'content'  : note.get('content', ''),
+                    'modified' : modified,
+                    'title'    : note.get('title'),
+                    'category' : note.get('category', None),
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
-                    'tags'       : []
+                    'favorite' : False
                    }
 
         self.notes[new_key] = new_note
@@ -396,7 +395,7 @@ class NotesDB():
         if (not n['deleted'] and deleted) or \
            (n['deleted'] and not deleted):
             n['deleted'] = deleted
-            n['modifydate'] = time.time()
+            n['modified'] = time.time()
             self.flag_what_changed(n, 'deleted')
             self.log('Note {0} (key={1})'.format('trashed' if deleted else 'untrashed', key))
 
@@ -405,7 +404,7 @@ class NotesDB():
         old_content = n.get('content')
         if content != old_content:
             n['content'] = content
-            n['modifydate'] = time.time()
+            n['modified'] = time.time()
             self.flag_what_changed(n, 'content')
             self.log('Note content updated (key={0})'.format(key))
 
@@ -415,7 +414,7 @@ class NotesDB():
         tags = utils.sanitise_tags(tags)
         if tags != old_tags:
             n['tags'] = tags
-            n['modifydate'] = time.time()
+            n['modified'] = time.time()
             self.flag_what_changed(n, 'tags')
             self.log('Note tags updated (key={0})'.format(key))
 
@@ -430,7 +429,7 @@ class NotesDB():
                 systemtags.append('pinned')
             else:
                 systemtags.remove('pinned')
-            n['modifydate'] = time.time()
+            n['modified'] = time.time()
             self.flag_what_changed(n, 'systemtags')
             self.log('Note {0} (key={1})'.format('pinned' if pinned else 'unpinned', key))
 
@@ -445,12 +444,12 @@ class NotesDB():
                 systemtags.append('markdown')
             else:
                 systemtags.remove('markdown')
-            n['modifydate'] = time.time()
+            n['modified'] = time.time()
             self.flag_what_changed(n, 'systemtags')
             self.log('Note markdown {0} (key={1})'.format('flagged' if markdown else 'unflagged', key))
 
     def helper_key_to_fname(self, k):
-        return os.path.join(self.config.get_config('db_path'), k) + '.json'
+        return os.path.join(self.config.get_config('db_path'), str(k)) + '.json'
 
     def helper_save_note(self, k, note):
         # Save a single note to disc.
@@ -498,11 +497,11 @@ class NotesDB():
         for note_index, local_key in enumerate(self.notes.keys()):
             n = self.notes[local_key]
 
-            if not n.get('key') or \
-               float(n.get('modifydate')) > float(n.get('syncdate')):
+            if not n.get('id') or \
+               float(n.get('modified')) > float(n.get('syncdate')):
 
                 savedate = float(n.get('savedate'))
-                if float(n.get('modifydate')) > savedate or \
+                if float(n.get('modified')) > savedate or \
                    float(n.get('syncdate')) > savedate:
                     # this will trigger a save to disk after sync algorithm
                     # we want this note saved even if offline or sync fails
@@ -545,7 +544,7 @@ class NotesDB():
                     # merge the note we got back (content could be empty)
                     # record syncdate and save the note at the assigned key
                     del self.notes[local_key]
-                    k = uret[0].get('key')
+                    k = uret[0].get('id')
                     n.update(uret[0])
                     n['syncdate'] = now
                     n['localkey'] = k
@@ -567,7 +566,7 @@ class NotesDB():
         if not server_sync:
             nl = []
         else:
-            nl = self.note.get_note_list(since=None if full_sync else self.last_sync)
+            nl = self.note.get_note_list()
 
             if nl[1] == 0:  # success
                 nl = nl[0]
@@ -584,7 +583,7 @@ class NotesDB():
         if not skip_remote_syncing:
             len_nl = len(nl)
             for note_index, n in enumerate(nl):
-                k = n.get('key')
+                k = n.get('id')
                 server_keys[k] = True
                 # this works because in the prior step we rewrite local keys to
                 # server keys when we get an updated note back from the server
@@ -660,16 +659,16 @@ class NotesDB():
     def get_note_status(self, key):
         n = self.notes[key]
         o = utils.KeyValueObject(saved=False, synced=False, modified=False)
-        modifydate = float(n['modifydate'])
+        modified = float(n['modified'])
         savedate   = float(n['savedate'])
         syncdate   = float(n['syncdate'])
 
-        if savedate > modifydate:
+        if savedate > modified:
             o.saved = True
         else:
             o.modified = True
 
-        if syncdate > modifydate:
+        if syncdate > modified:
             o.synced = True
 
         return o

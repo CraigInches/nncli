@@ -13,7 +13,7 @@ class ViewNote(urwid.ListBox):
     def __init__(self, config, args):
         self.config = config
         self.ndb = args['ndb']
-        self.key = args['key']
+        self.key = args['id']
         self.log = args['log']
         self.search_string = ''
         self.search_mode = 'gstyle'
@@ -136,7 +136,7 @@ class ViewNote(urwid.ListBox):
             title    = utils.get_note_title(self.old_note)
             version  = self.old_note['version']
         else:
-            t = time.localtime(float(self.note['modifydate']))
+            t = time.localtime(float(self.note['modified']))
             title    = utils.get_note_title(self.note)
             flags    = utils.get_note_flags(self.note)
             tags     = utils.get_note_tags(self.note)

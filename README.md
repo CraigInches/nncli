@@ -216,7 +216,7 @@ example:
 ``` echo '{"tags":["testing","new"],"content":"New note!"}' | nncli
 import - ```
 
-Allowed fields are `content`, `tags`, `systemtags`, `modifydate`,
+Allowed fields are `content`, `tags`, `systemtags`, `modified`,
 `createdate`, and `deleted`.
 
 ### Exporting

@@ -984,7 +984,7 @@ class nncli:
             view_note.ViewNote(self.config,
                                {
                                 'ndb' : self.ndb,
-                                'key' : key, # initial key to view or None
+                                'id' : key, # initial key to view or None
                                 'log' : self.log
                                })
 
@@ -1098,7 +1098,7 @@ class nncli:
 
         w = 60
         sep = '+' + '-'*(w+2) + '+'
-        t = time.localtime(float(note['modifydate']))
+        t = time.localtime(float(note['modified']))
         mod_time = time.strftime('%a, %d %b %Y %H:%M:%S', t)
         title = utils.get_note_title(note)
         flags = utils.get_note_flags(note)
@@ -1106,7 +1106,7 @@ class nncli:
 
         print(sep)
         print(('| {:<' + str(w) + '} |').format(('    Title: ' + title)[:w]))
-        print(('| {:<' + str(w) + '} |').format(('      Key: ' + note.get('key', 'Localkey: {}'.format(note.get('localkey'))))[:w]))
+        print(('| {:<' + str(w) + '} |').format(('      Key: ' + note.get('id', 'Localkey: {}'.format(note.get('localkey'))))[:w]))
         print(('| {:<' + str(w) + '} |').format(('     Date: ' + mod_time)[:w]))
         print(('| {:<' + str(w) + '} |').format(('     Tags: ' + tags)[:w]))
         print(('| {:<' + str(w) + '} |').format(('  Version: v' + str(note.get('version', 0)))[:w]))
