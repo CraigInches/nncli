@@ -433,21 +433,6 @@ class NotesDB():
             self.flag_what_changed(n, 'systemtags')
             self.log('Note {0} (key={1})'.format('pinned' if pinned else 'unpinned', key))
 
-    def set_note_markdown(self, key, markdown):
-        n = self.notes[key]
-        old_markdown = utils.note_markdown(n)
-        if markdown != old_markdown:
-            if 'systemtags' not in n:
-                n['systemtags'] = []
-            systemtags = n['systemtags']
-            if markdown:
-                systemtags.append('markdown')
-            else:
-                systemtags.remove('markdown')
-            n['modified'] = time.time()
-            self.flag_what_changed(n, 'systemtags')
-            self.log('Note markdown {0} (key={1})'.format('flagged' if markdown else 'unflagged', key))
-
     def helper_key_to_fname(self, k):
         return os.path.join(self.config.get_config('db_path'), str(k)) + '.json'
 
@@ -577,7 +562,7 @@ class NotesDB():
                 skip_remote_syncing = True
 
         # 3. for each remote note
-        #        if remote syncnum > local syncnum ||
+        #        if remote modified > local modified ||
         #           a new note and key is not in local store
         #            retrieve note, update note with response
         if not skip_remote_syncing:
@@ -590,7 +575,7 @@ class NotesDB():
                 if k in self.notes:
                     # we already have this note
                     # if the server note has a newer syncnum we need to get it
-                    if int(n.get('syncnum')) > int(self.notes[k].get('syncnum', -1)):
+                    if int(n.get('modified')) > int(self.notes[k].get('modified')):
                         gret = self.note.get_note(k)
                         if gret[1] == 0:
                             self.notes[k].update(gret[0])

@@ -790,30 +790,6 @@ class nncli:
 
             self.ndb.sync_worker_go()
 
-        elif key == self.config.get_keybind('note_markdown'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
-                if len(lb.body.positions()) <= 0:
-                    return None
-                note = lb.note_list[lb.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
-                note = lb.note
-
-            md = 1
-            if 'systemtags' in note:
-                if 'markdown' in note['systemtags']: md = 0
-                else:                                md = 1
-
-            self.ndb.set_note_markdown(note['localkey'], md)
-
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
-                lb.update_note_title()
-
-            self.ndb.sync_worker_go()
-
         elif key == self.config.get_keybind('note_tags'):
             if self.gui_body_get().__class__ != view_titles.ViewTitles and \
                self.gui_body_get().__class__ != view_note.ViewNote:
@@ -1224,16 +1200,6 @@ class nncli:
         self.ndb.set_note_pinned(key, pin)
         self.sync_notes()
 
-    def cli_note_markdown(self, key, markdown):
-
-        note = self.ndb.get_note(key)
-        if not note:
-            self.log('ERROR: Key does not exist')
-            return
-
-        self.ndb.set_note_markdown(key, markdown)
-        self.sync_notes()
-
     def cli_note_tags_get(self, key):
 
         note = self.ndb.get_note(key)
@@ -1328,7 +1294,6 @@ Usage:
   edit                        - edit a note (specified by <key>)
   < trash | untrash >         - trash/untrash a note (specified by <key>)
   < pin | unpin >             - pin/unpin a note (specified by <key>)
-  < markdown | unmarkdown >   - markdown/unmarkdown a note (specified by <key>)
   tag get                     - retrieve the tags from a note (specified by <key>)
   tag set <tags>              - set the tags for a note (specified by <key>)
   tag add <tags>              - add tags to a note (specified by <key>)
@@ -1449,14 +1414,6 @@ def main(argv=sys.argv[1:]):
 
         sn = nncli_start()
         sn.cli_note_pin(key, 1 if args[0] == 'pin' else 0)
-
-    elif args[0] == 'markdown' or args[0] == 'unmarkdown':
-
-        if not key:
-            usage()
-
-        sn = nncli_start()
-        sn.cli_note_markdown(key, 1 if args[0] == 'markdown' else 0)
 
     # Tag API
     elif args[0] == 'tag':

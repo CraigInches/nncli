@@ -114,7 +114,6 @@ class Config:
          'kb_sort_tags'       : 'ctrl t',
          'kb_note_trash'      : 'T',
          'kb_note_pin'        : 'p',
-         'kb_note_markdown'   : 'm',
          'kb_note_tags'       : 't',
          'kb_copy_note_text'  : 'y',
 
@@ -255,7 +254,6 @@ class Config:
         self.keybinds['sort_tags'] = [ cp.get(cfg_sec, 'kb_sort_tags'), [ 'titles' ], 'Sort notes by tags' ]
         self.keybinds['note_trash'] = [ cp.get(cfg_sec, 'kb_note_trash'), [ 'titles', 'notes' ], 'Trash a note' ]
         self.keybinds['note_pin'] = [ cp.get(cfg_sec, 'kb_note_pin'), [ 'titles', 'notes' ], 'Pin note' ]
-        self.keybinds['note_markdown'] = [ cp.get(cfg_sec, 'kb_note_markdown'), [ 'titles', 'notes' ], 'Flag note as markdown' ]
         self.keybinds['note_tags'] = [ cp.get(cfg_sec, 'kb_note_tags'), [ 'titles', 'notes' ], 'Edit note tags' ]
         self.keybinds['copy_note_text'] = [ cp.get(cfg_sec, 'kb_copy_note_text'), [ 'notes' ], 'Copy line (xsel/pbcopy)' ]
 

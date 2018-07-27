@@ -54,7 +54,6 @@ Check your OS distribution for installation packages.
   - edit note tags
   - trash/untrash notes
   - pin/unpin notes
-  - flag notes as markdown or not
   - vi-like keybinds (fully configurable)
   - Colors! (fully configurable)
 * Command Line (scripting)
@@ -69,7 +68,6 @@ Check your OS distribution for installation packages.
   - edit a note (via editor)
   - trash/untrash a note
   - pin/unpin a note
-  - flag note as markdown or not
   - view and edit note tags
 
 ### HowTo
@@ -95,8 +93,6 @@ Check your OS distribution for installation packages.
  - dump a note (specified by <key>) edit                        - edit a
    note (specified by <key>) < trash | untrash >         - trash/untrash
    a note (specified by <key>) < pin | unpin >             - pin/unpin a
-   note (specified by <key>) < markdown | unmarkdown >   -
-   markdown/unmarkdown a note (specified by <key>) tag get
    - retrieve the tags from a note (specified by <key>) tag set <tags>
    - set the tags for a note (specified by <key>) tag add <tags>
      - add tags to a note (specified by <key>) tag rm <tags>
@@ -162,7 +158,7 @@ formatting tags supports a width specifier (decimal) and a left
 justification (-) like that supported by printf:
 
 ``` %F - flags (fixed 5 char width) X - needs sync T - trashed
-       * - pinned S - published/shared m - markdown %T - tags %D - date
+       * - pinned S - published/shared m - tags %D - date
          %N - title ```
 
 The default note title format pushes the note tags to the far right of

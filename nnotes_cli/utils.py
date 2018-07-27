@@ -56,7 +56,6 @@ def get_note_tags(note):
 #   'T' - trashed
 #   '*' - pinned
 #   'S' - published/shared
-#   'm' - markdown
 def get_note_flags(note):
     flags = ''
     flags += 'X' if float(note['modified']) > float(note['syncdate']) else ' '
@@ -64,7 +63,6 @@ def get_note_flags(note):
     if 'systemtags' in note:
         flags += '*' if 'pinned'    in note['systemtags'] else ' '
         flags += 'S' if 'published' in note['systemtags'] else ' '
-        flags += 'm' if 'markdown'  in note['systemtags'] else ' '
     else:
         flags += '   '
     return flags
@@ -90,11 +88,7 @@ def get_note_title_file(note):
         else:
             fn = str(fn)
 
-        if note_markdown(note):
-            fn += '.mkdn'
-        else:
-            fn += '.txt'
-
+        fn += '.mkdn'
         return fn
     else:
         return ''
@@ -138,12 +132,6 @@ def note_pinned(n):
     if not asystags:
         return 0
     return 1 if 'pinned' in asystags else 0
-
-def note_markdown(n):
-    asystags = n.get('systemtags', 0)
-    if not asystags:
-        return 0
-    return 1 if 'markdown' in asystags else 0
 
 # TODO: NextCloud notes doesn't have a concept of tags, but it does
 # allow assignment of notes to a single category. Refactor to take this

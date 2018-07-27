@@ -13,11 +13,7 @@ def tempfile_create(note, raw=False, tempdir=None):
         tf.write(contents.encode('utf-8'))
         tf.flush()
     else:
-        ext = '.txt'
-        if note and \
-           'systemtags' in note and \
-           'markdown' in note['systemtags']:
-            ext = '.mkd'
+        ext = '.mkd'
         tf = tempfile.NamedTemporaryFile(suffix=ext, delete=False, dir=tempdir)
         if note:
             contents = note['content']

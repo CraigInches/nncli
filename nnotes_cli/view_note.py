@@ -152,7 +152,7 @@ class ViewNote(urwid.ListBox):
 
         status_key_index = \
             ('pack', urwid.AttrMap(urwid.Text(' [' + 
-                                              self.key + 
+                                              str(self.key) + 
                                               '] ' +
                                               str(cur + 1) +
                                               '/' +
