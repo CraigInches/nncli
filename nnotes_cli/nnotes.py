@@ -91,6 +91,7 @@ class NextcloudNote(object):
             res = requests.get(url)
             res.raise_for_status()
             note = res.json()
+            self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
             return e, -1
@@ -146,6 +147,7 @@ class NextcloudNote(object):
                 res = requests.post(url, data=data)
             res.raise_for_status()
             note = res.json()
+            self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
             return e, -1
@@ -218,6 +220,7 @@ class NextcloudNote(object):
             res.raise_for_status()
             #logging.debug('RESPONSE OK: ' + str(res))
             note_list = res.json()
+            self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
             status = -1
@@ -257,6 +260,7 @@ class NextcloudNote(object):
             #logging.debug('REQUEST DELETE: ' + self.DATA_URL+params)
             res = requests.delete(url)
             res.raise_for_status()
+            self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
             return e, -1
