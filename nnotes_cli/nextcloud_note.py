@@ -27,7 +27,7 @@
 
 # -*- coding: utf-8 -*-
 """
-    nnotes.py
+    nextcloud_note.py
     ~~~~~~~~~~~~~~
 
     Python library for accessing the NextCloud Notes API (v0.2)
@@ -44,6 +44,7 @@ import time
 import datetime
 import logging
 import requests
+import traceback
 
 try:
     import json
@@ -69,6 +70,9 @@ class NextcloudNote(object):
         self.api_url = \
             'https://{}:{}@{}/index.php/apps/notes/api/v0.2/notes'. \
                 format(username, password, host)
+        self.sanitized_url = \
+            'https://{}:****@{}/index.php/apps/notes/api/v0.2/notes'. \
+                format(username, host)
         self.status = 'offline'
 
     def get_note(self, noteid):
@@ -86,7 +90,7 @@ class NextcloudNote(object):
         """
         # request note
         url = '{}/{}'.format(self.api_url, str(noteid))
-        #logging.debug('REQUEST: ' + self.DATA_URL+params)
+        #logging.debug('REQUEST: ' + self.sanitized_url+params)
         try:
             res = requests.get(url)
             res.raise_for_status()
@@ -127,12 +131,10 @@ class NextcloudNote(object):
         # - use s.encode('utf-8') when bytes type needed
 
         # determine whether to create a new note or updated an existing one
-        params = {'auth': self.get_token(),
-                  'email': self.username}
         if "id" in note:
             # set modification timestamp if not set by client
             if 'modified' not in note:
-                note["modified"] = time.time()
+                note["modified"] = int(time.time())
 
             url = '{}/{}'.format(self.api_url, note["id"])
         else:
@@ -140,19 +142,21 @@ class NextcloudNote(object):
 
         #logging.debug('REQUEST: ' + url + ' - ' + str(note))
         try:
-            data = urllib.parse.quote(json.dumps(note))
+            logging.debug('NOTE: ' + str(note))
             if "id" in note:
-                res = requests.put(url, data=data)
+                res = requests.put(url, data=note)
             else:
-                res = requests.post(url, data=data)
-            res.raise_for_status()
+                res = requests.post(url, json=note)
             note = res.json()
+            res.raise_for_status()
+            logging.debug('NOTE (from response): ' + str(note))
             self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
             return e, -1
         except RequestException as e:
             logging.debug('RESPONSE ERROR: ' + str(e))
+            logging.debug(traceback.print_exc())
             self.status = 'error updating note, check log'
             return e, -1
         except ValueError as e:
@@ -214,7 +218,7 @@ class NextcloudNote(object):
 
         # perform initial HTTP request
         try:
-            logging.debug('REQUEST: ' + self.api_url + \
+            logging.debug('REQUEST: ' + self.sanitized_url + \
                 '?exclude=content')
             res = requests.get(self.api_url, params=params)
             res.raise_for_status()

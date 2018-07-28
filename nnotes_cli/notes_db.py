@@ -31,9 +31,9 @@
 
 import os, time, re, glob, json, copy, threading
 from . import utils
-from . import nnotes
-nnotes.NOTE_FETCH_LENGTH=100
-from .nnotes import NextcloudNote
+from . import nextcloud_note
+nextcloud_note.NOTE_FETCH_LENGTH=100
+from .nextcloud_note import NextcloudNote
 import logging
 
 class ReadError(RuntimeError):
@@ -58,7 +58,7 @@ class NotesDB():
         if not os.path.exists(self.config.get_config('db_path')):
             os.mkdir(self.config.get_config('db_path'))
 
-        now = time.time()
+        now = int(time.time())
         # now read all .json files from disk
         fnlist = glob.glob(self.helper_key_to_fname('*'))
 
@@ -302,11 +302,10 @@ class NotesDB():
         while new_key in self.notes:
             new_key = utils.generate_random_key()
 
-        timestamp = time.time()
+        timestamp = int(time.time())
 
         try:
             modified = float(note.get('modified', timestamp))
-            createdate = float(note.get('createdate', timestamp))
         except ValueError:
             raise ValueError('date fields must be numbers or string representations of numbers')
 
@@ -354,15 +353,14 @@ class NotesDB():
         while new_key in self.notes:
             new_key = utils.generate_random_key()
 
-        timestamp = time.time()
+        timestamp = int(time.time())
 
         # note has no internal key yet.
         new_note = {
                     'localkey' : new_key,
-                    'content'  : note.get('content', ''),
-                    'modified' : modified,
-                    'title'    : note.get('title'),
-                    'category' : note.get('category', None),
+                    'content'  : content,
+                    'modified' : timestamp,
+                    'category' : None,
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
                     'favorite' : False
@@ -395,7 +393,7 @@ class NotesDB():
         if (not n['deleted'] and deleted) or \
            (n['deleted'] and not deleted):
             n['deleted'] = deleted
-            n['modified'] = time.time()
+            n['modified'] = int(time.time())
             self.flag_what_changed(n, 'deleted')
             self.log('Note {0} (key={1})'.format('trashed' if deleted else 'untrashed', key))
 
@@ -404,7 +402,7 @@ class NotesDB():
         old_content = n.get('content')
         if content != old_content:
             n['content'] = content
-            n['modified'] = time.time()
+            n['modified'] = int(time.time())
             self.flag_what_changed(n, 'content')
             self.log('Note content updated (key={0})'.format(key))
 
@@ -414,7 +412,7 @@ class NotesDB():
         tags = utils.sanitise_tags(tags)
         if tags != old_tags:
             n['tags'] = tags
-            n['modified'] = time.time()
+            n['modified'] = int(time.time())
             self.flag_what_changed(n, 'tags')
             self.log('Note tags updated (key={0})'.format(key))
 
@@ -429,7 +427,7 @@ class NotesDB():
                 systemtags.append('pinned')
             else:
                 systemtags.remove('pinned')
-            n['modified'] = time.time()
+            n['modified'] = int(time.time())
             self.flag_what_changed(n, 'systemtags')
             self.log('Note {0} (key={1})'.format('pinned' if pinned else 'unpinned', key))
 
@@ -442,7 +440,7 @@ class NotesDB():
         json.dump(note, open(fn, 'w'), indent=2)
 
         # record that we saved this to disc.
-        note['savedate'] = time.time()
+        note['savedate'] = int(time.time())
 
     def sync_notes(self, server_sync=True, full_sync=True):
         """Perform a full bi-directional sync with server.
@@ -468,9 +466,9 @@ class NotesDB():
         local_updates = {}
         local_deletes = {}
         server_keys = {}
-        now = time.time()
+        now = int(time.time())
 
-        sync_start_time = time.time()
+        sync_start_time = int(time.time())
         sync_errors = 0
         skip_remote_syncing = False
 
@@ -507,17 +505,14 @@ class NotesDB():
 
                 if 'minversion' in cn:
                     del cn['minversion']
-                del cn['createdate']
                 del cn['syncdate']
                 del cn['savedate']
 
                 if 'what_changed' in cn:
-                    if 'deleted' not in cn['what_changed']:
-                        del cn['deleted']
-                    if 'systemtags' not in cn['what_changed'] and 'systemtags' in cn:
-                        del cn['systemtags']
-                    if 'tags' not in cn['what_changed']:
-                        del cn['tags']
+                    if 'category' not in cn['what_changed']:
+                        del cn['category']
+                    if 'favorite' not in cn['what_changed']:
+                        del cn['favorite']
                     if 'content' not in cn['what_changed']:
                         del cn['content']
                     del cn['what_changed']
