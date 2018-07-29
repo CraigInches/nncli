@@ -155,7 +155,7 @@ class NotesDB():
             # category patterns specified but note has no categories, so no match
             return 0
 
-        # for each cat_pat, we have to find a matching category 
+        # for each cat_pat, we have to find a matching category
         # .lower() used for case-insensitive search
         cat_pats_matched = 0
         for tp in cat_pats:
