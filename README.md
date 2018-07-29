@@ -42,18 +42,17 @@ Check your OS distribution for installation packages.
   - full two-way sync with NextCloud Notes performed dynamically in the
     background
   - all actions logged and easily reviewed
-  - list note titles (configurable format w/ title, date, flags, tags,
+  - list note titles (configurable format w/ title, date, flags, category,
     keys, etc)
-  - sort notes by date, alpha by title, tags, pinned on top
+  - sort notes by date, alpha by title, category, favorite on top
   - search for notes using a Google style search pattern or Regular
     Expression
   - view note contents and meta data
-  - view and restore previous versions of notes
   - pipe note contents to external command
   - create and edit notes (using your editor)
-  - edit note tags
-  - trash/untrash notes
-  - pin/unpin notes
+  - edit note category
+  - delete notes
+  - favorite/unfavorite notes
   - vi-like keybinds (fully configurable)
   - Colors! (fully configurable)
 * Command Line (scripting)
@@ -66,9 +65,9 @@ Check your OS distribution for installation packages.
   - create a new note (via stdin or editor)
   - import a note with raw json data (stdin or editor)
   - edit a note (via editor)
-  - trash/untrash a note
-  - pin/unpin a note
-  - view and edit note tags
+  - delete a note
+  - favorite/unfavorite a note
+  - view and edit note category
 
 ### HowTo
 
@@ -91,12 +90,11 @@ Check your OS distribution for installation packages.
  note in JSON format ('-' JSON from stdin) export                      -
  export a note in JSON format (specified by <key>) dump
  - dump a note (specified by <key>) edit                        - edit a
-   note (specified by <key>) < trash | untrash >         - trash/untrash
-   a note (specified by <key>) < pin | unpin >             - pin/unpin a
-   - retrieve the tags from a note (specified by <key>) tag set <tags>
-   - set the tags for a note (specified by <key>) tag add <tags>
-     - add tags to a note (specified by <key>) tag rm <tags>
-       - remove tags from a note (specified by <key>) ```
+   note (specified by <key>) delete         - delete
+   a note (specified by <key>) < favorite | unfavorite >             - favorite/unfavorite a
+   - retrieve the category from a note (specified by <key>) cat set <category>
+   - set the category for a note (specified by <key>) 
+     cat rm  - remove category from a note (specified by <key>) ```
 
 #### Configuration
 
@@ -157,11 +155,11 @@ supported for dynamically building the title string. Each of these
 formatting tags supports a width specifier (decimal) and a left
 justification (-) like that supported by printf:
 
-``` %F - flags (fixed 5 char width) X - needs sync T - trashed
-       * - pinned S - published/shared m - tags %D - date
+``` %F - flags (fixed 5 char width) X - needs sync 
+       * - favorited m - tags %D - date
          %N - title ```
 
-The default note title format pushes the note tags to the far right of
+The default note title format pushes the note category to the far right of
 the terminal and left justifies the note title after the date and flags:
 
 ``` cfg_format_note_title = '[%D] %F %-N %T' ```
@@ -188,7 +186,7 @@ A Google style search string is a group of tokens (separated by spaces)
 with an implied *AND* between each token. This style search is case
 insensitive. For example:
 
-``` /tag:tag1 tag:tag2 word1 "word2 word3" tag:tag3 ```
+``` /category:category1 category:category2 word1 "word2 word3" category:category3 ```
 
 Regular expression searching also supports the use of flags (currently
 only case-insensitive) by adding a final forward slash followed by the
@@ -209,11 +207,9 @@ flags. The following example will do a case-insensitive search for
 nncli can import notes from raw json data (via stdin or editor). For
 example:
 
-``` echo '{"tags":["testing","new"],"content":"New note!"}' | nncli
-import - ```
+``` echo '{"category":"testing","content":"New note!"}' | nncli import - ```
 
-Allowed fields are `content`, `tags`, `systemtags`, `modified`,
-`createdate`, and `deleted`.
+Allowed fields are `content`, `category`, `favorite`, and `modified`
 
 ### Exporting
 
@@ -230,27 +226,21 @@ Note that nncli still stores all the notes data in the directory
 specified by `cfg_db_path`, so for easy backups, it may be
 easier/quicker to simply backup this entire directory.
 
-### Tags
+### Category
 
-Note tags can be modified directly from the command line. Example:
+Note category can be modified directly from the command line. Example:
 
-``` # Retrieve note tags, as one comma-separated string (e.g.
-"tag1,tag2") nncli -k somekeyid tag get                  # Returns
-"tag1,tag2"
+``` # Retrieve note category (e.g. "category1") 
+nncli -k somekeyid cat get
+# Returns "category1"
 
-# Add a tag to a note, if it doesn't already have it nncli -k somekeyid
-tag add "tag3"           # Now tagged as "tag1,tag2,tag3"
+# Add a category to a note, overwriting any existing one
+nncli -k somekeyid cat set "category3"
+# Now tagged as "category3"
 
-# Remove a tag from a note nncli -k somekeyid tag rm "tag2"            #
-Now tagged as "tag1,tag3"
-
-# Overwrite all of the tags for a note nncli -k somekeyid tag set
-"tag2,tag4"      # Now tagged as "tag2,tag4" ```
-
-Note that in SimpleNote, tags are case-insensitive, so "TAG2", "tag2",
-and "tAg2" are interpreted as the same and will all be converted to
-lowercase.
-
+# Remove a category from a note
+nncli -k somekeyid cat rm
+# Note now has no category
 
 ### Tricks
 

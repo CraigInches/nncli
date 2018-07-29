@@ -56,9 +56,9 @@ class Config:
          'cfg_nn_username'       : '',
          'cfg_nn_password'       : '',
          'cfg_db_path'           : self.cache_home,
-         'cfg_search_tags'       : 'yes',  # with regex searches
+         'cfg_search_categories' : 'yes',  # with regex searches
          'cfg_sort_mode'         : 'date', # 'alpha' or 'date'
-         'cfg_pinned_ontop'      : 'yes',
+         'cfg_favorite_ontop'    : 'yes',
          'cfg_tabstop'           : '4',
          'cfg_format_strftime'   : '%Y/%m/%d',
          'cfg_format_note_title' : '[%D] %F %-N %T',
@@ -96,12 +96,6 @@ class Config:
          'kb_tabstop2'        : '2',
          'kb_tabstop4'        : '4',
          'kb_tabstop8'        : '8',
-         'kb_prev_version'    : '<',
-         'kb_next_version'    : '>',
-         'kb_diff_version'    : 'D',
-         'kb_restore_version' : 'R',
-         'kb_latest_version'  : 'L',
-         'kb_select_version'  : '#',
          'kb_search_gstyle'   : '/',
          'kb_search_regex'    : 'meta /',
          'kb_search_prev_gstyle'   : '?',
@@ -111,10 +105,10 @@ class Config:
          'kb_clear_search'    : 'A',
          'kb_sort_date'       : 'd',
          'kb_sort_alpha'      : 'a',
-         'kb_sort_tags'       : 'ctrl t',
-         'kb_note_trash'      : 'T',
-         'kb_note_pin'        : 'p',
-         'kb_note_tags'       : 't',
+         'kb_sort_categories' : 'ctrl t',
+         'kb_note_delete'     : 'D',
+         'kb_note_favorite'   : 'p',
+         'kb_note_category'   : 't',
          'kb_copy_note_text'  : 'y',
 
          'clr_default_fg'                : 'default',
@@ -141,8 +135,8 @@ class Config:
          'clr_note_date_bg'              : 'default',
          'clr_note_flags_fg'             : 'dark magenta',
          'clr_note_flags_bg'             : 'default',
-         'clr_note_tags_fg'              : 'dark red',
-         'clr_note_tags_bg'              : 'default',
+         'clr_note_category_fg'          : 'dark red',
+         'clr_note_category_bg'          : 'default',
          'clr_note_content_fg'           : 'default',
          'clr_note_content_bg'           : 'default',
          'clr_note_content_focus_fg'     : 'white',
@@ -196,9 +190,9 @@ class Config:
         self.configs['nn_password'] = [ nn_password, 'NextCloud Password' ]
         self.configs['nn_host'] = [ cp.get(cfg_sec, 'cfg_nn_host', raw=True), 'NextCloud server hostname' ]
         self.configs['db_path'] = [ cp.get(cfg_sec, 'cfg_db_path'), 'Note storage path' ]
-        self.configs['search_tags'] = [ cp.get(cfg_sec, 'cfg_search_tags'), 'Search tags as well' ]
+        self.configs['search_categories'] = [ cp.get(cfg_sec, 'cfg_search_categories'), 'Search categories as well' ]
         self.configs['sort_mode'] = [ cp.get(cfg_sec, 'cfg_sort_mode'), 'Sort mode' ]
-        self.configs['pinned_ontop'] = [ cp.get(cfg_sec, 'cfg_pinned_ontop'), 'Pinned at top of list' ]
+        self.configs['favorite_ontop'] = [ cp.get(cfg_sec, 'cfg_favorite_ontop'), 'Favorite at top of list' ]
         self.configs['tabstop'] = [ cp.get(cfg_sec, 'cfg_tabstop'), 'Tabstop spaces' ]
         self.configs['format_strftime'] = [ cp.get(cfg_sec, 'cfg_format_strftime', raw=True), 'Date strftime format' ]
         self.configs['format_note_title'] = [ cp.get(cfg_sec, 'cfg_format_note_title', raw=True), 'Note title format' ]
@@ -236,12 +230,6 @@ class Config:
         self.keybinds['tabstop2'] = [ cp.get(cfg_sec, 'kb_tabstop2'), [ 'notes' ], 'View with tabstop=2' ]
         self.keybinds['tabstop4'] = [ cp.get(cfg_sec, 'kb_tabstop4'), [ 'notes' ], 'View with tabstop=4' ]
         self.keybinds['tabstop8'] = [ cp.get(cfg_sec, 'kb_tabstop8'), [ 'notes' ], 'View with tabstop=8' ]
-        self.keybinds['prev_version'] = [ cp.get(cfg_sec, 'kb_prev_version'), [ 'notes' ], 'View previous version' ]
-        self.keybinds['next_version'] = [ cp.get(cfg_sec, 'kb_next_version'), [ 'notes' ], 'View next version' ]
-        self.keybinds['diff_version'] = [ cp.get(cfg_sec, 'kb_diff_version'), [ 'notes' ], 'Diff version of note' ]
-        self.keybinds['restore_version'] = [ cp.get(cfg_sec, 'kb_restore_version'), [ 'notes' ], 'Restore version of note' ]
-        self.keybinds['latest_version'] = [ cp.get(cfg_sec, 'kb_latest_version'), [ 'notes' ], 'View latest version' ]
-        self.keybinds['select_version'] = [ cp.get(cfg_sec, 'kb_select_version'), [ 'notes' ], 'Select version' ]
         self.keybinds['search_gstyle'] = [ cp.get(cfg_sec, 'kb_search_gstyle'), [ 'titles', 'notes' ], 'Search using gstyle' ]
         self.keybinds['search_prev_gstyle'] = [ cp.get(cfg_sec, 'kb_search_prev_gstyle'), [ 'notes' ], 'Search backwards using gstyle' ]
         self.keybinds['search_regex'] = [ cp.get(cfg_sec, 'kb_search_regex'), [ 'titles', 'notes' ], 'Search using regex' ]
@@ -251,10 +239,10 @@ class Config:
         self.keybinds['clear_search'] = [ cp.get(cfg_sec, 'kb_clear_search'), [ 'titles' ], 'Show all notes' ]
         self.keybinds['sort_date'] = [ cp.get(cfg_sec, 'kb_sort_date'), [ 'titles' ], 'Sort notes by date' ]
         self.keybinds['sort_alpha'] = [ cp.get(cfg_sec, 'kb_sort_alpha'), [ 'titles' ], 'Sort notes by alpha' ]
-        self.keybinds['sort_tags'] = [ cp.get(cfg_sec, 'kb_sort_tags'), [ 'titles' ], 'Sort notes by tags' ]
-        self.keybinds['note_trash'] = [ cp.get(cfg_sec, 'kb_note_trash'), [ 'titles', 'notes' ], 'Trash a note' ]
-        self.keybinds['note_pin'] = [ cp.get(cfg_sec, 'kb_note_pin'), [ 'titles', 'notes' ], 'Pin note' ]
-        self.keybinds['note_tags'] = [ cp.get(cfg_sec, 'kb_note_tags'), [ 'titles', 'notes' ], 'Edit note tags' ]
+        self.keybinds['sort_categories'] = [ cp.get(cfg_sec, 'kb_sort_categories'), [ 'titles' ], 'Sort notes by categories' ]
+        self.keybinds['note_delete'] = [ cp.get(cfg_sec,'kb_note_delete'), [ 'titles', 'notes' ], 'Delete a note' ]
+        self.keybinds['note_favorite'] = [ cp.get(cfg_sec, 'kb_note_favorite'), [ 'titles', 'notes' ], 'Favorite note' ]
+        self.keybinds['note_category'] = [ cp.get(cfg_sec, 'kb_note_category'), [ 'titles', 'notes' ], 'Edit note category' ]
         self.keybinds['copy_note_text'] = [ cp.get(cfg_sec, 'kb_copy_note_text'), [ 'notes' ], 'Copy line (xsel/pbcopy)' ]
 
         self.colors = collections.OrderedDict()
@@ -282,8 +270,8 @@ class Config:
         self.colors['note_date_bg'] = [ cp.get(cfg_sec, 'clr_note_date_bg'), 'Note date bg' ]
         self.colors['note_flags_fg'] = [ cp.get(cfg_sec, 'clr_note_flags_fg'), 'Note flags fg' ]
         self.colors['note_flags_bg'] = [ cp.get(cfg_sec, 'clr_note_flags_bg'), 'Note flags bg' ]
-        self.colors['note_tags_fg'] = [ cp.get(cfg_sec, 'clr_note_tags_fg'), 'Note tags fg' ]
-        self.colors['note_tags_bg'] = [ cp.get(cfg_sec, 'clr_note_tags_bg'), 'Note tags bg' ]
+        self.colors['note_category_fg'] = [ cp.get(cfg_sec, 'clr_note_category_fg'), 'Note category fg' ]
+        self.colors['note_category_bg'] = [ cp.get(cfg_sec, 'clr_note_category_bg'), 'Note category bg' ]
         self.colors['note_content_fg'] = [ cp.get(cfg_sec, 'clr_note_content_fg'), 'Note content fg' ]
         self.colors['note_content_bg'] = [ cp.get(cfg_sec, 'clr_note_content_bg'), 'Note content bg' ]
         self.colors['note_content_focus_fg'] = [ cp.get(cfg_sec, 'clr_note_content_focus_fg'), 'Note content focus fg' ]

@@ -342,30 +342,15 @@ class nncli:
                     self.last_view.append(self.gui_body_get())
                 self.gui_body_set(new_view)
 
-    def trash_note_callback(self, key, yes):
-        if not yes:
+    def delete_note_callback(self, key, delete):
+        if not delete:
             return
-
-        # toggle the deleted flag
         note = self.ndb.get_note(key)
-        self.ndb.set_note_deleted(key, 0 if note['deleted'] else 1)
+        self.ndb.set_note_deleted(key, True)
 
         if self.gui_body_get().__class__ == view_titles.ViewTitles:
             self.view_titles.update_note_title()
 
-        self.gui_update_status_bar()
-        self.ndb.sync_worker_go()
-
-    def restore_note_callback(self, key, yes):
-        if not yes:
-            return
-
-        # restore the contents of the old_note
-        self.log('Restoring version v{0} (key={1})'.
-                 format(self.view_note.old_note['version'], key))
-        self.ndb.set_note_content(key, self.view_note.old_note['content'])
-
-        self.view_note.update_note_view()
         self.gui_update_status_bar()
         self.ndb.sync_worker_go()
 
@@ -389,31 +374,17 @@ class nncli:
                 self.view_titles.update_note_list(search_string, args[0], sort_mode=self.current_sort_mode)
                 self.gui_body_set(self.view_titles)
 
-    def gui_version_input(self, args, version):
+    def gui_category_input(self, args, category):
         self.gui_footer_input_clear()
         self.gui_body_focus()
         self.master_frame.keypress = self.gui_frame_keypress
-        if version:
-            try:
-                # verify input is a number
-                int(version)
-            except ValueError as e:
-                self.log('ERROR: Invalid version value')
-                return
-            self.view_note.update_note_view(version=version)
-            self.gui_update_status_bar()
-
-    def gui_tags_input(self, args, tags):
-        self.gui_footer_input_clear()
-        self.gui_body_focus()
-        self.master_frame.keypress = self.gui_frame_keypress
-        if tags != None:
+        if category != None:
             if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 note = self.view_titles.note_list[self.view_titles.focus_position].note
             else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = self.view_note.note
 
-            self.ndb.set_note_tags(note['localkey'], tags)
+            self.ndb.set_note_category(note['localkey'], category)
 
             if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 self.view_titles.update_note_title()
@@ -574,76 +545,6 @@ class nncli:
                 self.view_titles.note_list[self.view_titles.focus_position].note['localkey'])
             self.gui_switch_frame_body(self.view_note)
 
-        elif key == self.config.get_keybind('prev_version') or \
-             key == self.config.get_keybind('next_version'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            diff = -1 if key == self.config.get_keybind('prev_version') else 1
-
-            version = diff + (self.view_note.old_note['version']
-                              if self.view_note.old_note else
-                                 self.view_note.note['version'])
-
-            lb.update_note_view(version=version)
-
-        elif key == self.config.get_keybind('diff_version'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            if not self.view_note.old_note:
-                self.log('Already at latest version (key={0})'.
-                         format(self.view_note.key))
-                return None
-
-            self.gui_clear()
-            self.exec_diff_on_note(self.view_note.note,
-                                   self.view_note.old_note)
-            self.gui_reset()
-
-        elif key == self.config.get_keybind('restore_version'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            if not self.view_note.old_note:
-                self.log('Already at latest version (key={0})'.
-                         format(self.view_note.key))
-                return None
-
-            self.gui_footer_input_set(
-                urwid.AttrMap(
-                    user_input.UserInput(
-                        self.config,
-                        'Restore v{0} (y/n): '.format(self.view_note.old_note['version']),
-                        '',
-                        self.gui_yes_no_input,
-                        [ self.restore_note_callback, self.view_note.key ]),
-                    'user_input_bar'))
-            self.gui_footer_focus_input()
-            self.master_frame.keypress = self.gui_footer_input_get().keypress
-
-        elif key == self.config.get_keybind('latest_version'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            lb.update_note_view(version=None)
-
-        elif key == self.config.get_keybind('select_version'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
-                return key
-
-            self.gui_footer_input_set(
-                urwid.AttrMap(
-                    user_input.UserInput(
-                        self.config,
-                        key,
-                        '',
-                        self.gui_version_input,
-                        None),
-                    'user_input_bar'))
-            self.gui_footer_focus_input()
-            self.master_frame.keypress = self.gui_footer_input_get().keypress
-
         elif key == self.config.get_keybind('status'):
             if self.status_bar == 'yes':
                 self.status_bar = 'no'
@@ -742,7 +643,8 @@ class nncli:
             self.gui_footer_focus_input()
             self.master_frame.keypress = self.gui_footer_input_get().keypress
 
-        elif key == self.config.get_keybind('note_trash'):
+        elif key == self.config.get_keybind('note_delete'):
+            logging.debug('Delete key pressed')
             if self.gui_body_get().__class__ != view_titles.ViewTitles and \
                self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
@@ -758,15 +660,15 @@ class nncli:
                 urwid.AttrMap(
                     user_input.UserInput(
                         self.config,
-                        '{0} (y/n): '.format('Untrash' if note['deleted'] else 'Trash'),
+                        'Delete (y/n): ',
                         '',
                         self.gui_yes_no_input,
-                        [ self.trash_note_callback, note['localkey'] ]),
+                        [ self.delete_note_callback, note['localkey'] ]),
                     'user_input_bar'))
             self.gui_footer_focus_input()
             self.master_frame.keypress = self.gui_footer_input_get().keypress
 
-        elif key == self.config.get_keybind('note_pin'):
+        elif key == self.config.get_keybind('note_favorite'):
             if self.gui_body_get().__class__ != view_titles.ViewTitles and \
                self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
@@ -778,19 +680,18 @@ class nncli:
             else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = lb.note
 
-            pin = 1
-            if 'systemtags' in note:
-                if 'pinned' in note['systemtags']: pin = 0
-                else:                              pin = 1
+            favorite = 1
+            if 'favorite' in note: favorite = 0
+            else:                   favorite = 1
 
-            self.ndb.set_note_pinned(note['localkey'], pin)
+            self.ndb.set_note_favorite(note['localkey'], favorite)
 
             if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 lb.update_note_title()
 
             self.ndb.sync_worker_go()
 
-        elif key == self.config.get_keybind('note_tags'):
+        elif key == self.config.get_keybind('note_category'):
             if self.gui_body_get().__class__ != view_titles.ViewTitles and \
                self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
@@ -806,9 +707,9 @@ class nncli:
                 urwid.AttrMap(
                     user_input.UserInput(
                         self.config,
-                        'Tags: ',
-                        '%s' % ','.join(note['tags']),
-                        self.gui_tags_input,
+                        'Category: ',
+                        '%s' % ','.join(note['category']),
+                        self.gui_category_input,
                         None),
                     'user_input_bar'))
             self.gui_footer_focus_input()
@@ -885,12 +786,12 @@ class nncli:
             self.current_sort_mode = 'alpha'
             self.view_titles.sort_note_list('alpha')
 
-        elif key == self.config.get_keybind('sort_tags'):
+        elif key == self.config.get_keybind('sort_categories'):
             if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
-            self.current_sort_mode = 'tags'
-            self.view_titles.sort_note_list('tags')
+            self.current_sort_mode = 'categories'
+            self.view_titles.sort_note_list('categories')
 
         elif key == self.config.get_keybind('copy_note_text'):
             if self.gui_body_get().__class__ != view_note.ViewNote:
@@ -1005,9 +906,9 @@ class nncli:
             ('note_flags',
                 self.config.get_color('note_flags_fg'),
                 self.config.get_color('note_flags_bg') ),
-            ('note_tags',
-                self.config.get_color('note_tags_fg'),
-                self.config.get_color('note_tags_bg') ),
+            ('note_category',
+                self.config.get_color('note_category_fg'),
+                self.config.get_color('note_category_bg') ),
             ('note_content',
                 self.config.get_color('note_content_fg'),
                 self.config.get_color('note_content_bg') ),
@@ -1078,19 +979,14 @@ class nncli:
         mod_time = time.strftime('%a, %d %b %Y %H:%M:%S', t)
         title = utils.get_note_title(note)
         flags = utils.get_note_flags(note)
-        tags  = utils.get_note_tags(note)
+        category  = utils.get_note_category(note)
 
         print(sep)
         print(('| {:<' + str(w) + '} |').format(('    Title: ' + title)[:w]))
         print(('| {:<' + str(w) + '} |').format(('      Key: ' + note.get('id', 'Localkey: {}'.format(note.get('localkey'))))[:w]))
         print(('| {:<' + str(w) + '} |').format(('     Date: ' + mod_time)[:w]))
-        print(('| {:<' + str(w) + '} |').format(('     Tags: ' + tags)[:w]))
-        print(('| {:<' + str(w) + '} |').format(('  Version: v' + str(note.get('version', 0)))[:w]))
+        print(('| {:<' + str(w) + '} |').format(('     Category: ' + category)[:w]))
         print(('| {:<' + str(w) + '} |').format(('    Flags: [' + flags + ']')[:w]))
-        if utils.note_published(note) and 'publishkey' in note:
-            print(('| {:<' + str(w) + '} |').format(('Published: http://simp.ly/publish/' + note['publishkey'])[:w]))
-        else:
-            print(('| {:<' + str(w) + '} |').format(('Published: n/a')[:w]))
         print(sep)
         print((note['content']))
 
@@ -1180,85 +1076,56 @@ class nncli:
         else:
             self.log('Note unchanged')
 
-    def cli_note_trash(self, key, trash):
+    def cli_note_delete(self, key, delete):
 
         note = self.ndb.get_note(key)
         if not note:
             self.log('ERROR: Key does not exist')
             return
 
-        self.ndb.set_note_deleted(key, trash)
+        self.ndb.set_note_deleted(key, delete)
         self.sync_notes()
 
-    def cli_note_pin(self, key, pin):
+    def cli_note_favorite(self, key, favorite):
 
         note = self.ndb.get_note(key)
         if not note:
             self.log('ERROR: Key does not exist')
             return
 
-        self.ndb.set_note_pinned(key, pin)
+        self.ndb.set_note_favorite(key, favorite)
         self.sync_notes()
 
-    def cli_note_tags_get(self, key):
+    def cli_note_category_get(self, key):
 
         note = self.ndb.get_note(key)
         if not note:
             self.log('ERROR: Key does not exist')
             return
 
-        tags = utils.get_note_tags(note)
-        return tags
+        category = utils.get_note_category(note)
+        return category
 
-    def cli_note_tags_set(self, key, tags):
+    def cli_note_category_set(self, key, category):
 
         note = self.ndb.get_note(key)
         if not note:
             self.log('Error: Key does not exist')
             return
 
-        self.ndb.set_note_tags(key, tags.lower())
+        self.ndb.set_note_category(key, category.lower())
         self.sync_notes()
 
-    def cli_note_tags_add(self, key, new_tags):
+    def cli_note_category_rm(self, key):
 
         note = self.ndb.get_note(key)
         if not note:
             self.log('Error: Key does not exist')
             return
 
-        # Add tag only if it isn't already there
-        old_tags = self.cli_note_tags_get(key)
-        if old_tags:
-            old_tag_list = old_tags.lower().split(',')
-            new_tag_list = new_tags.lower().split(',')
-            tag_list = old_tag_list
-            for tag in new_tag_list:
-                if tag not in tag_list:
-                    tag_list.append(tag)
-            tags = ','.join(tag_list)
-        else:
-            tags = new_tags
-
-        self.cli_note_tags_set(key, tags)
-
-    def cli_note_tags_rm(self, key, rm_tags):
-
-        note = self.ndb.get_note(key)
-        if not note:
-            self.log('Error: Key does not exist')
-            return
-
-        old_tags = self.cli_note_tags_get(key)
-        if old_tags:
-            old_tag_list = old_tags.lower().split(',')
-            rm_tag_list = rm_tags.lower().split(',')
-            tag_list = old_tag_list
-            for tag in rm_tag_list:
-                if tag in tag_list:
-                    tag_list.remove(tag)
-            tags = ','.join(tag_list)
-            self.cli_note_tags_set(key, tags)
+        old_category = self.cli_note_category_get(key)
+        if old_category:
+            self.cli_note_category_set(key, None)
 
 def SIGINT_handler(signum, frame):
     print('\nSignal caught, bye!')
@@ -1292,12 +1159,11 @@ Usage:
   export                      - export a note in JSON format (specified by <key>)
   dump                        - dump a note (specified by <key>)
   edit                        - edit a note (specified by <key>)
-  < trash | untrash >         - trash/untrash a note (specified by <key>)
-  < pin | unpin >             - pin/unpin a note (specified by <key>)
-  tag get                     - retrieve the tags from a note (specified by <key>)
-  tag set <tags>              - set the tags for a note (specified by <key>)
-  tag add <tags>              - add tags to a note (specified by <key>)
-  tag rm <tags>               - remove tags from a note (specified by <key>)
+  delete                      - delete a note (specified by <key>)
+  < favorite | unfavorite >   - favorite/unfavorite a note (specified by <key>)
+  cat get                     - retrieve the category from a note (specified by <key>)
+  cat set <category>          - set the category for a note (specified by <key>)
+  cat rm                      - remove category from a note (specified by <key>)
 ''')
     sys.exit(0)
 
@@ -1399,58 +1265,51 @@ def main(argv=sys.argv[1:]):
         sn = nncli_start()
         sn.cli_note_edit(key)
 
-    elif args[0] == 'trash' or args[0] == 'untrash':
+    elif args[0] == 'delete':
 
         if not key:
             usage()
 
         sn = nncli_start()
-        sn.cli_note_trash(key, 1 if args[0] == 'trash' else 0)
+        sn.cli_note_delete(key, True)
 
-    elif args[0] == 'pin' or args[0] == 'unpin':
+    elif args[0] == 'favorite' or args[0] == 'unfavorite':
 
         if not key:
             usage()
 
         sn = nncli_start()
-        sn.cli_note_pin(key, 1 if args[0] == 'pin' else 0)
+        sn.cli_note_favorite(key, 1 if args[0] == 'favorite' else 0)
 
-    # Tag API
-    elif args[0] == 'tag':
+    # Category API
+    elif args[0] == 'cat':
 
         if not key:
             usage()
 
         nargs = len(args)
-        correct_get = (args[1] == 'get' and nargs == 2)
-        correct_other = (args[1] in ['set', 'add', 'rm'] and nargs == 3)
-        if not (correct_get or correct_other):
+        correct_other = (args[1] in ['get', 'rm'] and nargs == 2)
+        correct_set = (args[1] == 'set' and nargs == 3)
+        if not (correct_set or correct_other):
             usage()
 
         if args[1] == 'get':
 
             sn = nncli_start()
-            tags = sn.cli_note_tags_get(key)
-            if tags:
-                print(tags)
+            category = sn.cli_note_category_get(key)
+            if category:
+                print(category)
 
         elif args[1] == 'set':
 
-            tags = args[2]
+            category = args[2]
             sn = nncli_start()
-            sn.cli_note_tags_set(key, tags)
-
-        elif args[1] == 'add':
-
-            new_tags = args[2]
-            sn = nncli_start()
-            sn.cli_note_tags_add(key, new_tags)
+            sn.cli_note_category_set(key, category)
 
         elif args[1] == 'rm':
 
-            rm_tags = args[2]
             sn = nncli_start()
-            sn.cli_note_tags_rm(key, rm_tags)
+            sn.cli_note_category_rm(key)
 
     else:
         usage()

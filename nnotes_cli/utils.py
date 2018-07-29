@@ -31,9 +31,6 @@
 
 import datetime, random, re
 
-# first line with non-whitespace should be the title
-note_title_re = re.compile('\s*(.*)\n?')
-
 def generate_random_key():
     """Generate random 30 digit (15 byte) hex string.
 
@@ -41,36 +38,28 @@ def generate_random_key():
     """
     return '%030x' % (random.randrange(256**15),)
 
-def get_note_tags(note):
-    if 'tags' in note:
-        tags = '%s' % ','.join(note['tags'])
-        if 'deleted' in note and note['deleted']:
-            if tags: tags += ',trash'
-            else:    tags = 'trash'
+def get_note_category(note):
+    if 'category' in note:
+        category = note['category'] if note['category'] is not None else ''
     else:
-        tags = ''
-    return tags
+        category = ''
+    return category
 
 # Returns a fixed length string:
 #   'X' - needs sync
-#   'T' - trashed
-#   '*' - pinned
-#   'S' - published/shared
+#   '*' - favorite
 def get_note_flags(note):
     flags = ''
     flags += 'X' if float(note['modified']) > float(note['syncdate']) else ' '
-    flags += 'T' if 'deleted' in note and note['deleted'] else ' '
-    if 'systemtags' in note:
-        flags += '*' if 'pinned'    in note['systemtags'] else ' '
-        flags += 'S' if 'published' in note['systemtags'] else ' '
+    if 'favorite' in note:
+        flags += '*' if note['favorite'] else ' '
     else:
-        flags += '   '
+        flags += '  '
     return flags
 
 def get_note_title(note):
-    mo = note_title_re.match(note.get('content', ''))
-    if mo:
-        return mo.groups()[0]
+    if 'title' in note:
+        return note['title']
     else:
         return ''
 
@@ -121,53 +110,22 @@ def human_date(timestamp):
         # not today or this year, so we do "Dec 11, 2011"
         return '%s %d, %d' % (dt.strftime('%b'), dt.day, dt.year)
 
-def note_published(n):
-    asystags = n.get('systemtags', 0)
-    if not asystags:
-        return 0
-    return 1 if 'published' in asystags else 0
-
-def note_pinned(n):
-    asystags = n.get('systemtags', 0)
-    if not asystags:
-        return 0
-    return 1 if 'pinned' in asystags else 0
-
-# TODO: NextCloud notes doesn't have a concept of tags, but it does
-# allow assignment of notes to a single category. Refactor to take this
-# into account
-tags_illegal_chars = re.compile(r'[\s]')
-def sanitise_tags(tags):
-    """
-    Given a string containing comma-separated tags, sanitise and return a list of string tags.
-
-    The NextCloud API doesn't allow for spaces, so we strip those out.
-
-    @param tags: Comma-separated tags, one string.
-    @returns: List of strings.
-    """
-    # hack out all kinds of whitespace, then split on ,
-    # if you run into more illegal characters (NextCloud does not want to sync them)
-    # add them to the regular expression above.
-    illegals_removed = tags_illegal_chars.sub('', tags)
-    if len(illegals_removed) == 0:
-        # special case for empty string ''
-        # split turns that into [''], which is not valid
-        return []
-
+def note_favorite(n):
+    if 'favorite' in n:
+        return n['favorite']
     else:
-        return illegals_removed.split(',')
+        return False
 
-def sort_by_title_pinned(a):
-    return (not note_pinned(a.note), get_note_title(a.note))
+def sort_by_title_favorite(a):
+    return (not note_favorite(a.note), get_note_title(a.note))
 
-def sort_notes_by_tags(notes, pinned_ontop=False):
-    notes.sort(key=lambda i: (pinned_ontop and not note_pinned(i.note),
-                              i.note.get('tags'),
+def sort_notes_by_categories(notes, favorite_ontop=False):
+    notes.sort(key=lambda i: (favorite_ontop and not note_favorite(i.note),
+                              i.note.get('category'),
                               get_note_title(i.note)))
 
-def sort_by_modify_date_pinned(a):
-    if note_pinned(a.note):
+def sort_by_modify_date_favorite(a):
+    if note_favorite(a.note):
         return 100.0 * float(a.note.get('modified', 0))
     else:
         return float(a.note.get('modified', 0))

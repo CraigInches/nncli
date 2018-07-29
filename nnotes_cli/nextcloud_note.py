@@ -107,9 +107,9 @@ class NextcloudNote(object):
 
         # # use UTF-8 encoding
         # note["content"] = note["content"].encode('utf-8')
-        # # For early versions of notes, tags not always available
-        # if "tags" in note:
-        #     note["tags"] = [t.encode('utf-8') for t in note["tags"]]
+        # # For early versions of notes, category is not always available
+        # if "category" in note:
+        #     note["category"] = [t.encode('utf-8') for t in note["category"]]
         #logging.debug('RESPONSE OK: ' + str(note))
         return note, 0
 
@@ -194,12 +194,12 @@ class NextcloudNote(object):
 
         The function can be passed optional arguments to limit the
         date range of the list returned and/or limit the list to notes
-        containing a certain tag. If omitted a list of all notes
+        containing a certain category. If omitted a list of all notes
         is returned.
 
         Arguments:
-            - category=None list of tags as string: return notes that have
-              at least one of these tags
+            - category=None category as string: return notes tagged to
+              this category
 
         Returns:
             A tuple `(notes, status)`
@@ -244,11 +244,11 @@ class NextcloudNote(object):
 
         return note_list, status
 
-    def delete_note(self, note_id):
+    def delete_note(self, note):
         """ method to permanently delete a note
 
         Arguments:
-            - note_id (string): key of the note to trash
+            - note_id (string): key of the note to delete
 
         Returns:
             A tuple `(note, status)`
@@ -257,11 +257,11 @@ class NextcloudNote(object):
             - status (int): 0 on sucesss and -1 otherwise
 
         """
-        # notes have to be trashed before deletion
-        url = '{}/{}'.format(self.api_url, str(note_id))
+        url = '{}/{}'.format(self.api_url, str(note['id']))
+        logurl = '{}/{}'.format(self.sanitized_url, str(note['id']))
 
         try:
-            #logging.debug('REQUEST DELETE: ' + self.DATA_URL+params)
+            logging.debug('REQUEST DELETE: ' + logurl)
             res = requests.delete(url)
             res.raise_for_status()
             self.status = 'online'

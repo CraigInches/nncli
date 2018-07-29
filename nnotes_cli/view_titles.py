@@ -41,7 +41,7 @@ class ViewTitles(urwid.ListBox):
         supported by printf.
 
         %F -- flags
-        %T -- tags
+        %T -- category
         %D -- date
         %N -- note title
         """
@@ -50,7 +50,7 @@ class ViewTitles(urwid.ListBox):
         mod_time = time.strftime(self.config.get_config('format_strftime'), t)
         title = utils.get_note_title(note)
         flags = utils.get_note_flags(note)
-        tags  = utils.get_note_tags(note)
+        category  = utils.get_note_category(note)
 
         # get the age of the note
         dt = datetime.datetime.fromtimestamp(time.mktime(t))
@@ -91,10 +91,10 @@ class ViewTitles(urwid.ListBox):
                                                          wrap='clip'),
                                               'note_date'))
                 elif fmt.group(4) == 'T':
-                    m = (width, urwid.AttrMap(urwid.Text(tags,
+                    m = (width, urwid.AttrMap(urwid.Text(category,
                                                          align=align,
                                                          wrap='clip'),
-                                              'note_tags'))
+                                              'note_category'))
                 elif fmt.group(4) == 'N':
                     if   note_age == 'd': attr = 'note_title_day'
                     elif note_age == 'w': attr = 'note_title_week'
@@ -135,7 +135,7 @@ class ViewTitles(urwid.ListBox):
                                'note_title_ancient' : 'note_focus',
                                'note_date'          : 'note_focus',
                                'note_flags'         : 'note_focus',
-                               'note_tags'          : 'note_focus' })
+                               'note_categories'    : 'note_focus' })
 
     def get_note_titles(self):
         lines = []

@@ -1,2 +1,2 @@
-1. Trash->Delete
-2. Pin->Favorite
+1. Pin->Favorite
+2. Tags->Category

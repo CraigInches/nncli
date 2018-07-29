@@ -100,18 +100,19 @@ class NotesDB():
 
     def filtered_notes_sort(self, filtered_notes, sort_mode='date'):
         if sort_mode == 'date':
-            if self.config.get_config('pinned_ontop') == 'yes':
-                filtered_notes.sort(key=utils.sort_by_modify_date_pinned, reverse=True)
+            if self.config.get_config('favorite_ontop') == 'yes':
+                filtered_notes.sort(key=utils.sort_by_modify_date_favorite, reverse=True)
             else:
                 filtered_notes.sort(key=lambda o: -float(o.note.get('modified', 0)))
         elif sort_mode == 'alpha':
-            if self.config.get_config('pinned_ontop') == 'yes':
-                filtered_notes.sort(key=utils.sort_by_title_pinned)
+            if self.config.get_config('favorite_ontop') == 'yes':
+                filtered_notes.sort(key=utils.sort_by_title_favorite)
             else:
                 filtered_notes.sort(key=lambda o: utils.get_note_title(o.note))
-        elif sort_mode == 'tags':
-            pinned = self.config.get_config('pinned_ontop')
-            utils.sort_notes_by_tags(filtered_notes, pinned_ontop=pinned)
+        elif sort_mode == 'categories':
+            favorite = self.config.get_config('favorite_ontop')
+            utils.sort_notes_by_categories(filtered_notes, \
+                    favorite_ontop=favorite)
 
     def filter_notes(self, search_string=None, search_mode='gstyle', sort_mode='date'):
         """Return list of notes filtered with search string.
@@ -137,34 +138,35 @@ class NotesDB():
 
         return filtered_notes, match_regexp, active_notes
 
-    def _helper_gstyle_tagmatch(self, tag_pats, note):
+    def _helper_gstyle_categorymatch(self, cat_pats, note):
         # Returns:
-        #  2 = match    - no tag patterns specified
-        #  1 = match    - all tag patterns match a tag on this note
-        #  0 = no match - note has no tags or not all tag patterns match
+        #  2 = match    - no category patterns specified
+        #  1 = match    - all category patterns match a category on this
+        #                 note
+        #  0 = no match - note has no category or not all category patterns match
 
-        if not tag_pats:
-            # match because no tag patterns were specified
+        if not cat_pats:
+            # match because no category patterns were specified
             return 2
 
-        note_tags = note.get('tags')
+        note_category = note.get('category')
 
-        if not note_tags:
-            # tag patterns specified but note has no tags, so no match
+        if not note_category:
+            # category patterns specified but note has no categories, so no match
             return 0
 
-        # for each tag_pat, we have to find a matching tag
+        # for each cat_pat, we have to find a matching category 
         # .lower() used for case-insensitive search
-        tag_pats_matched = 0
-        for tp in tag_pats:
+        cat_pats_matched = 0
+        for tp in cat_pats:
             tp = tp.lower()
-            for t in note_tags:
+            for t in note_category:
                 if tp in t.lower():
-                    tag_pats_matched += 1
+                    cat_pats_matched += 1
                     break
 
-        if tag_pats_matched == len(tag_pats):
-            # all tag patterns specified matched a tag on this note
+        if cat_pats_matched == len(cat_pats):
+            # all category patterns specified matched a category on this note
             return 1
 
         # note doesn't match
@@ -189,42 +191,31 @@ class NotesDB():
     def filter_notes_gstyle(self, search_string=None):
 
         filtered_notes = []
-
-        # total number of notes, excluding deleted
-        # if tag:trash then counts deleted as well
         active_notes = 0
 
         if not search_string:
             for k in self.notes:
                 n = self.notes[k]
-                if n.get('deleted'):
-                    continue
                 active_notes += 1
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, tagfound=0))
+                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
 
             return filtered_notes, [], active_notes
 
-        # group0: tag:([^\s]+)
+        # group0: category:([^\s]+)
         # group1: multiple words in quotes
         # group2: single words
 
-        # example result for: 'tag:tag1 tag:tag2 word1 "word2 word3" tag:tag3'
-        # [ ('tag1', '',            ''),
-        #   ('tag2', '',            ''),
+        # example result for: 'category:category1 category:category2 word1 "word2 word3" category:category3'
+        # [ ('category1', '',            ''),
+        #   ('category2', '',            ''),
         #   ('',     '',            'word1'),
         #   ('',     'word2 word3', ''),
-        #   ('tag3', '',            '') ]
+        #   ('category3', '',            '') ]
 
-        groups = re.findall('tag:([^\s]+)|"([^"]+)"|([^\s]+)', search_string)
+        groups = re.findall('category:([^\s]+)|"([^"]+)"|([^\s]+)', search_string)
         all_pats = [[] for _ in range(3)]
 
-        search_trash = False
-        for g in groups:
-            if g[0] == 'trash':
-                groups.remove(g)
-                search_trash = True
-
-        # we end up with [[tag_pats],[multi_word_pats],[single_word_pats]]
+        # we end up with [[cat_pats],[multi_word_pats],[single_word_pats]]
         for g in groups:
             for i in range(3):
                 if g[i]: all_pats[i].append(g[i])
@@ -232,31 +223,19 @@ class NotesDB():
         for k in self.notes:
             n = self.notes[k]
 
-            if not search_trash and n.get('deleted'):
-                continue
-
             active_notes += 1
 
-            if search_trash and len(groups) == 0:
-                # simple search of only 'tag:trash' to get all trashed notes
-                if n.get('deleted'):
-                    filtered_notes.append(
-                        utils.KeyValueObject(key=k,
-                                             note=n,
-                                             tagfound=1))
-                continue
-
-            tagmatch = self._helper_gstyle_tagmatch(all_pats[0], n)
+            catmatch = self._helper_gstyle_catmatch(all_pats[0], n)
 
             word_pats = all_pats[1] + all_pats[2]
 
-            if tagmatch and \
+            if catmatch and \
                self._helper_gstyle_wordmatch(word_pats, n.get('content')):
                 # we have a note that can go through!
                 filtered_notes.append(
                     utils.KeyValueObject(key=k,
                                          note=n,
-                                         tagfound=1 if tagmatch == 1 else 0))
+                                         catfound=1 if catmatch == 1 else 0))
 
         return filtered_notes, '|'.join(all_pats[1] + all_pats[2]), active_notes
 
@@ -276,21 +255,21 @@ class NotesDB():
             active_notes += 1
 
             if not sspat:
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, tagfound=0))
+                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
                 continue
 
-            if self.config.get_config('search_tags') == 'yes':
-                tag_matched = False
-                for t in n.get('tags'):
+            if self.config.get_config('search_categories') == 'yes':
+                cat_matched = False
+                for t in n.get('category'):
                     if sspat.search(t):
-                        tag_matched = True
-                        filtered_notes.append(utils.KeyValueObject(key=k, note=n, tagfound=1))
+                        cat_matched = True
+                        filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=1))
                         break
-                if tag_matched:
+                if cat_matched:
                     continue
 
             if sspat.search(n.get('content')):
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, tagfound=0))
+                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
 
         match_regexp = search_string if sspat else ''
         return filtered_notes, match_regexp, active_notes
@@ -317,30 +296,23 @@ class NotesDB():
                     'category' : note.get('category', None),
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
-                    'favorite' : False
+                    'favorite' : False,
+                    'deleted'  : False
                    }
 
         # sanity check all note values
         if not isinstance(new_note['content'], str):
             raise ValueError('"content" must be a string')
-        if not new_note['deleted'] in (0, 1):
-            raise ValueError('"deleted" must be 0 or 1')
 
         for n in (new_note['modified']):
             if not 0 <= n <= timestamp:
                 raise ValueError('date fields must be real')
 
-        if not isinstance(new_note['tags'], list):
-            raise ValueError('"tags" must be an array')
-        for tag in new_note['tags']:
-            if not isinstance(tag, str):
-                raise ValueError('items in the "tags" array must be strings')
+        if not isinstance(new_note['category'], str):
+            raise ValueError('"category" must be an string')
 
-        if not isinstance(new_note['systemtags'], list):
-            raise ValueError('"systemtags" must be an array')
-        for tag in new_note['systemtags']:
-            if not isinstance(tag, str):
-                raise ValueError('items in the "systemtags" array must be strings')
+        if not isinstance(new_note['favorite'], bool):
+            raise ValueError('"favorite" must be a boolean')
 
         self.notes[new_key] = new_note
 
@@ -363,7 +335,8 @@ class NotesDB():
                     'category' : None,
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
-                    'favorite' : False
+                    'favorite' : False,
+                    'deleted'  : False
                    }
 
         self.notes[new_key] = new_note
@@ -373,11 +346,11 @@ class NotesDB():
     def get_note(self, key):
         return self.notes[key]
 
-    def get_note_systemtags(self, key):
-        return self.notes[key].get('systemtags')
+    def get_note_favorite(self, key):
+        return self.notes[key].get('favorite')
 
-    def get_note_tags(self, key):
-        return self.notes[key].get('tags')
+    def get_note_category(self, key):
+        return self.notes[key].get('category')
 
     def get_note_content(self, key):
         return self.notes[key].get('content')
@@ -390,12 +363,12 @@ class NotesDB():
 
     def set_note_deleted(self, key, deleted):
         n = self.notes[key]
-        if (not n['deleted'] and deleted) or \
-           (n['deleted'] and not deleted):
+        old_deleted = n['deleted'] if 'deleted' in n else 0
+        if old_deleted != deleted:
             n['deleted'] = deleted
             n['modified'] = int(time.time())
             self.flag_what_changed(n, 'deleted')
-            self.log('Note {0} (key={1})'.format('trashed' if deleted else 'untrashed', key))
+            self.log('Note marked for deletion (key={0})'.format(key))
 
     def set_note_content(self, key, content):
         n = self.notes[key]
@@ -406,30 +379,25 @@ class NotesDB():
             self.flag_what_changed(n, 'content')
             self.log('Note content updated (key={0})'.format(key))
 
-    def set_note_tags(self, key, tags):
+    def set_note_category(self, key, category):
         n = self.notes[key]
-        old_tags = n.get('tags')
-        tags = utils.sanitise_tags(tags)
-        if tags != old_tags:
-            n['tags'] = tags
+        old_category = n.get('category')
+        if category != old_category:
+            n['category'] = category
             n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'tags')
-            self.log('Note tags updated (key={0})'.format(key))
+            self.flag_what_changed(n, 'category')
+            self.log('Note category updated (key={0})'.format(key))
 
-    def set_note_pinned(self, key, pinned):
+    def set_note_favorite(self, key, favorite):
         n = self.notes[key]
-        old_pinned = utils.note_pinned(n)
-        if pinned != old_pinned:
-            if 'systemtags' not in n:
-                n['systemtags'] = []
-            systemtags = n['systemtags']
-            if pinned:
-                systemtags.append('pinned')
-            else:
-                systemtags.remove('pinned')
+        old_favorite = utils.note_favorite(n)
+        if favorite != old_favorite:
+            n['favorite'] = favorite
             n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'systemtags')
-            self.log('Note {0} (key={1})'.format('pinned' if pinned else 'unpinned', key))
+            self.flag_what_changed(n, 'favorite')
+            self.log('Note {0} (key={1})'. \
+                    format('favorite' if favorited else \
+                    'unfavorited', key))
 
     def helper_key_to_fname(self, k):
         return os.path.join(self.config.get_config('db_path'), str(k)) + '.json'
@@ -507,6 +475,7 @@ class NotesDB():
                     del cn['minversion']
                 del cn['syncdate']
                 del cn['savedate']
+                del cn['deleted']
 
                 if 'what_changed' in cn:
                     if 'category' not in cn['what_changed']:
@@ -517,7 +486,10 @@ class NotesDB():
                         del cn['content']
                     del cn['what_changed']
 
-                uret = self.note.update_note(cn)
+                if n['deleted']:
+                    uret = self.note.delete_note(cn)
+                else:
+                    uret = self.note.update_note(cn)
 
                 if uret[1] == 0: # success
                     # if this is a new note our local key is not valid anymore
@@ -577,6 +549,7 @@ class NotesDB():
                             local_updates[k] = True
                             self.notes[k]['syncdate'] = now
                             self.notes[k]['localkey'] = k
+                            self.notes[k]['deleted'] = False
 
                             self.log('Synced newer note from server (key={0})'.format(k))
                         else:
@@ -590,6 +563,7 @@ class NotesDB():
                         local_updates[k] = True
                         self.notes[k]['syncdate'] = now
                         self.notes[k]['localkey'] = k
+                        self.notes[k]['deleted'] = False
 
                         self.log('Synced new note from server (key={0})'.format(k))
                     else:
@@ -631,10 +605,6 @@ class NotesDB():
             self.log("Full sync completed")
 
         return sync_errors
-
-    def get_note_version(self, key, version):
-        gret = self.note.get_note(key, version)
-        return gret[0] if gret[1] == 0 else None
 
     def get_note_status(self, key):
         n = self.notes[key]

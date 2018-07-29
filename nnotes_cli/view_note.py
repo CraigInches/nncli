@@ -50,30 +50,6 @@ class ViewNote(urwid.ListBox):
             self.note     = self.ndb.get_note(self.key)
             self.old_note = None
 
-        if self.key and version:
-            # verify version is within range
-            if int(version) <= 0 or int(version) >= self.note['version'] + 1:
-                self.log('Version v{0} is unavailable (key={1})'.
-                         format(version, self.key))
-                return
-
-        if (not version and self.old_note) or \
-           (self.key and version and version == self.note['version']):
-            self.log('Displaying latest version v{0} of note (key={1})'.
-                     format(self.note['version'], self.key))
-            self.old_note = None
-        elif self.key and version:
-            # get a previous version of the note
-            self.log('Fetching version v{0} of note (key={1})'.
-                     format(version, self.key))
-            version_note = self.ndb.get_note_version(self.key, version)
-            if not version_note:
-                self.log('Failed to get version v{0} of note (key={1})'.
-                         format(version, self.key))
-                # don't do anything, keep current note/version
-            else:
-                self.old_note = version_note
-
         self.body[:] = \
             urwid.SimpleFocusListWalker(self.get_note_content_as_list())
         if not self.search_string:
@@ -131,16 +107,10 @@ class ViewNote(urwid.ListBox):
             cur   = self.focus_position
             total = len(self.body.positions())
 
-        if self.old_note:
-            t = time.localtime(float(self.old_note['versiondate']))
-            title    = utils.get_note_title(self.old_note)
-            version  = self.old_note['version']
-        else:
-            t = time.localtime(float(self.note['modified']))
-            title    = utils.get_note_title(self.note)
-            flags    = utils.get_note_flags(self.note)
-            tags     = utils.get_note_tags(self.note)
-            version  = self.note.get('version', 0)
+        t = time.localtime(float(self.note['modified']))
+        title    = utils.get_note_title(self.note)
+        flags    = utils.get_note_flags(self.note)
+        category = utils.get_note_category(self.note)
 
         mod_time = time.strftime('Date: %a, %d %b %Y %H:%M:%S', t)
 
@@ -164,37 +134,19 @@ class ViewNote(urwid.ListBox):
                                      wrap='clip'),
                           'status_bar')
 
-        if self.old_note:
-            status_tags_flags = \
-                ('pack', urwid.AttrMap(urwid.Text('[OLD:v' + 
-                                                  str(version) + 
-                                                  ']'),
-                                       'status_bar'))
-        else:
-            status_tags_flags = \
-                ('pack', urwid.AttrMap(urwid.Text('[' + 
-                                                  tags + 
-                                                  '] [v' + 
-                                                  str(version) + 
-                                                  '] [' + 
-                                                  flags + 
-                                                  ']'),
-                                       'status_bar'))
+        status_category_flags = \
+            ('pack', urwid.AttrMap(urwid.Text('[' + 
+                                              category + 
+                                              '] [' + 
+                                              flags + 
+                                              ']'),
+                                   'status_bar'))
 
         pile_top = urwid.Columns([ status_title, status_key_index ])
-        pile_bottom = urwid.Columns([ status_date, status_tags_flags ])
+        pile_bottom = urwid.Columns([ status_date, status_category_flags ])
 
-        if self.old_note or \
-           not (utils.note_published(self.note) and 'publishkey' in self.note):
-            return urwid.AttrMap(urwid.Pile([ pile_top, pile_bottom ]),
-                                 'status_bar')
-
-        pile_publish = \
-            urwid.AttrMap(urwid.Text('Published: http://simp.ly/publish/' +
-                                     self.note['publishkey']),
-                          'status_bar')
         return \
-            urwid.AttrMap(urwid.Pile([ pile_top, pile_bottom, pile_publish ]),
+            urwid.AttrMap(urwid.Pile([ pile_top, pile_bottom ]),
                           'status_bar')
 
     def copy_note_text(self):
