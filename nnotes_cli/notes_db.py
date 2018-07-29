@@ -293,7 +293,9 @@ class NotesDB():
                     'content'  : note.get('content', ''),
                     'modified' : modified,
                     'title'    : note.get('title'),
-                    'category' : note.get('category', None),
+                    'category' : note.get('category') \
+                            if note.get('category') is not None \
+                            else '',
                     'savedate'   : 0, # never been written to disc
                     'syncdate'   : 0, # never been synced with server
                     'favorite' : False,
@@ -308,7 +310,8 @@ class NotesDB():
             if not 0 <= n <= timestamp:
                 raise ValueError('date fields must be real')
 
-        if not isinstance(new_note['category'], str):
+        if not isinstance(new_note['category'], str) or \
+                new_note['category'] is None:
             raise ValueError('"category" must be an string')
 
         if not isinstance(new_note['favorite'], bool):
@@ -326,17 +329,19 @@ class NotesDB():
             new_key = utils.generate_random_key()
 
         timestamp = int(time.time())
+        title = content.split('\n')[0]
 
         # note has no internal key yet.
         new_note = {
                     'localkey' : new_key,
                     'content'  : content,
                     'modified' : timestamp,
-                    'category' : None,
-                    'savedate'   : 0, # never been written to disc
-                    'syncdate'   : 0, # never been synced with server
+                    'category' : '',
+                    'savedate' : 0, # never been written to disc
+                    'syncdate' : 0, # never been synced with server
                     'favorite' : False,
-                    'deleted'  : False
+                    'deleted'  : False,
+                    'title'    : title
                    }
 
         self.notes[new_key] = new_note
@@ -476,15 +481,23 @@ class NotesDB():
                 del cn['syncdate']
                 del cn['savedate']
                 del cn['deleted']
+                if 'etag' in cn:
+                    del cn['etag']
+                if 'title' in cn:
+                    del cn['title']
 
                 if 'what_changed' in cn:
+                    if 'content' not in cn['what_changed'] \
+                            and 'category' not in cn['what_changed']:
+                        del cn['content']
                     if 'category' not in cn['what_changed']:
                         del cn['category']
                     if 'favorite' not in cn['what_changed']:
                         del cn['favorite']
-                    if 'content' not in cn['what_changed']:
-                        del cn['content']
                     del cn['what_changed']
+
+                if 'favorite' in cn:
+                    cn['favorite'] = str.lower(str(cn['favorite']))
 
                 if n['deleted']:
                     uret = self.note.delete_note(cn)
@@ -497,9 +510,13 @@ class NotesDB():
                     # record syncdate and save the note at the assigned key
                     del self.notes[local_key]
                     k = uret[0].get('id')
+                    t = uret[0].get('title')
+                    c = uret[0].get('category')
+                    c = c if c is not None else ''
                     n.update(uret[0])
                     n['syncdate'] = now
                     n['localkey'] = k
+                    n['category'] = c
                     self.notes[k] = n
 
                     local_updates[k] = True
@@ -536,6 +553,8 @@ class NotesDB():
             len_nl = len(nl)
             for note_index, n in enumerate(nl):
                 k = n.get('id')
+                c = n.get('category') if n.get('category') is not None \
+                        else ''
                 server_keys[k] = True
                 # this works because in the prior step we rewrite local keys to
                 # server keys when we get an updated note back from the server
@@ -549,6 +568,7 @@ class NotesDB():
                             local_updates[k] = True
                             self.notes[k]['syncdate'] = now
                             self.notes[k]['localkey'] = k
+                            self.notes[k]['category'] = c
                             self.notes[k]['deleted'] = False
 
                             self.log('Synced newer note from server (key={0})'.format(k))
@@ -563,6 +583,7 @@ class NotesDB():
                         local_updates[k] = True
                         self.notes[k]['syncdate'] = now
                         self.notes[k]['localkey'] = k
+                        self.notes[k]['category'] = c
                         self.notes[k]['deleted'] = False
 
                         self.log('Synced new note from server (key={0})'.format(k))

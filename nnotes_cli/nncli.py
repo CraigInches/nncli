@@ -644,7 +644,6 @@ class nncli:
             self.master_frame.keypress = self.gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('note_delete'):
-            logging.debug('Delete key pressed')
             if self.gui_body_get().__class__ != view_titles.ViewTitles and \
                self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
@@ -708,7 +707,7 @@ class nncli:
                     user_input.UserInput(
                         self.config,
                         'Category: ',
-                        '%s' % ','.join(note['category']),
+                        note['category'],
                         self.gui_category_input,
                         None),
                     'user_input_bar'))

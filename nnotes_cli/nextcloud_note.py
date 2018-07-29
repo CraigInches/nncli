@@ -137,19 +137,20 @@ class NextcloudNote(object):
                 note["modified"] = int(time.time())
 
             url = '{}/{}'.format(self.api_url, note["id"])
+            del note["id"]
         else:
             url = self.api_url
 
         #logging.debug('REQUEST: ' + url + ' - ' + str(note))
         try:
             logging.debug('NOTE: ' + str(note))
-            if "id" in note:
+            if url != self.api_url:
                 res = requests.put(url, data=note)
             else:
-                res = requests.post(url, json=note)
+                res = requests.post(url, data=note)
             note = res.json()
             res.raise_for_status()
-            logging.debug('NOTE (from response): ' + str(note))
+            logging.debug('NOTE (from response): ' + str(res.json()))
             self.status = 'online'
         except ConnectionError as e:
             self.status = 'offline, connection error'
