@@ -12,7 +12,7 @@ class Clipboard(object):
         if (spawn.find_executable('pbcopy')):
             return 'echo "%s" | pbcopy'
         return None
-    
+
     def copy(self, text):
         if (self.copy_command):
             os.system(self.copy_command % text)

@@ -93,7 +93,7 @@ Check your OS distribution for installation packages.
    note (specified by <key>) delete         - delete
    a note (specified by <key>) < favorite | unfavorite >             - favorite/unfavorite a
    - retrieve the category from a note (specified by <key>) cat set <category>
-   - set the category for a note (specified by <key>) 
+   - set the category for a note (specified by <key>)
      cat rm  - remove category from a note (specified by <key>) ```
 
 #### Configuration
@@ -155,7 +155,7 @@ supported for dynamically building the title string. Each of these
 formatting tags supports a width specifier (decimal) and a left
 justification (-) like that supported by printf:
 
-``` %F - flags (fixed 5 char width) X - needs sync 
+``` %F - flags (fixed 5 char width) X - needs sync
        * - favorited m - tags %D - date
          %N - title ```
 
@@ -230,7 +230,7 @@ easier/quicker to simply backup this entire directory.
 
 Note category can be modified directly from the command line. Example:
 
-``` # Retrieve note category (e.g. "category1") 
+``` # Retrieve note category (e.g. "category1")
 nncli -k somekeyid cat get
 # Returns "category1"
 

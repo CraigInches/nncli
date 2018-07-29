@@ -169,7 +169,7 @@ class nncli:
         out = temp.tempfile_create(None, tempdir=self.tempdir)
 
         try:
-            subprocess.call(diff + ' ' + 
+            subprocess.call(diff + ' ' +
                             temp.tempfile_name(ltf) + ' ' +
                             temp.tempfile_name(otf) + ' > ' +
                             temp.tempfile_name(out),
@@ -1145,7 +1145,7 @@ Usage:
   -r, --regex                 - search string is a regular expression
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
-  -c <file>, --config=<file>  - config file to read from (defaults to 
+  -c <file>, --config=<file>  - config file to read from (defaults to
                                 ~/.config/nncli/config)
 
  COMMANDS:

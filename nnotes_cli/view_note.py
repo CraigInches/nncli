@@ -121,8 +121,8 @@ class ViewNote(urwid.ListBox):
                           'status_bar')
 
         status_key_index = \
-            ('pack', urwid.AttrMap(urwid.Text(' [' + 
-                                              str(self.key) + 
+            ('pack', urwid.AttrMap(urwid.Text(' [' +
+                                              str(self.key) +
                                               '] ' +
                                               str(cur + 1) +
                                               '/' +
@@ -135,10 +135,10 @@ class ViewNote(urwid.ListBox):
                           'status_bar')
 
         status_category_flags = \
-            ('pack', urwid.AttrMap(urwid.Text('[' + 
-                                              category + 
-                                              '] [' + 
-                                              flags + 
+            ('pack', urwid.AttrMap(urwid.Text('[' +
+                                              category +
+                                              '] [' +
+                                              flags +
                                               ']'),
                                    'status_bar'))
 
