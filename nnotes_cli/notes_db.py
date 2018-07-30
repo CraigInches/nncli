@@ -401,7 +401,7 @@ class NotesDB():
             n['modified'] = int(time.time())
             self.flag_what_changed(n, 'favorite')
             self.log('Note {0} (key={1})'. \
-                    format('favorite' if favorited else \
+                    format('favorite' if favorite else \
                     'unfavorited', key))
 
     def helper_key_to_fname(self, k):

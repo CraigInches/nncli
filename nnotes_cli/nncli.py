@@ -679,9 +679,7 @@ class nncli:
             else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = lb.note
 
-            favorite = 1
-            if 'favorite' in note: favorite = 0
-            else:                   favorite = 1
+            favorite = not note['favorite']
 
             self.ndb.set_note_favorite(note['localkey'], favorite)
 

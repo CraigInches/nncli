@@ -1,3 +1,3 @@
-1. Pin->Favorite
-2. Sort
+1. Sort
+2. Search
 3. Command line
