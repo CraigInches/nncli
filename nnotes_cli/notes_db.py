@@ -225,7 +225,7 @@ class NotesDB():
 
             active_notes += 1
 
-            catmatch = self._helper_gstyle_catmatch(all_pats[0], n)
+            catmatch = self._helper_gstyle_categorymatch(all_pats[0], n)
 
             word_pats = all_pats[1] + all_pats[2]
 

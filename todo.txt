@@ -1,3 +1,1 @@
-1. Sort
-2. Search
-3. Command line
+1. Command line
