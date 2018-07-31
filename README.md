@@ -5,7 +5,7 @@ NextCloud Notes Command Line Interface
 
 nncli is a Python application that gives you access to your NextCloud
 Notes account via the command line. It's a fork of
-[sncli](https://github.com/insanum/sncli) You can access your notes via
+[sncli](https://github.com/insanum/sncli). You can access your notes via
 a customizable console GUI that implements vi-like keybinds or via a
 simple command line interface that you can script.
 
@@ -20,7 +20,6 @@ Check your OS distribution for installation packages.
 ### Requirements
 
 * [Python 3](http://python.org)
-* [pip](https://pip.pypa.io/en/stable/)
 * [Urwid](http://urwid.org) Python 3 module
 * [Requests](https://requests.readthedocs.org/en/master/) Python 3
   module
@@ -32,7 +31,7 @@ Check your OS distribution for installation packages.
   - `pip3 install nncli`
 * Manually:
   - Clone this repository to your hard disk: `git clone
-    https://github.com/insanum/nncli.git`
+    https://github.com/djmoch/nncli.git`
   - Install the requirements `pip3 install -r requirements.txt`
   - Install _nncli_: `python3 setup.py install`
 
@@ -71,30 +70,37 @@ Check your OS distribution for installation packages.
 
 ### HowTo
 
-``` Usage: nncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
+```
+Usage:
+ nncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
 
- OPTIONS: -h, --help                  - usage help -v, --verbose
- - verbose output -n, --nosync                - don't perform a server
-   sync -r, --regex                 - search string is a regular
-   expression -k <key>, --key=<key>       - note key -t <title>,
-   --title=<title> - title of note for create (cli mode) -c <file>,
-   --config=<file>  - config file to read from (defaults to ~/.nnclirc)
+ OPTIONS:
+  -h, --help                  - usage help
+  -v, --verbose               - verbose output
+  -n, --nosync                - don't perform a server sync
+  -r, --regex                 - search string is a regular expression
+  -k <key>, --key=<key>       - note key
+  -t <title>, --title=<title> - title of note for create (cli mode)
+  -c <file>, --config=<file>  - config file to read from (defaults to
+                                ~/.config/nncli/config)
 
- COMMANDS: <none>                      - console gui mode when no
- command specified sync                        - perform a full sync
- with the server list [search_string]        - list notes (refined with
- search string) export [search_string]      - export notes in JSON
- (refined with search string) dump [search_string]        - dump notes
- (refined with search string) create [-]                  - create a
- note ('-' content from stdin) import [-]                  - import a
- note in JSON format ('-' JSON from stdin) export                      -
- export a note in JSON format (specified by <key>) dump
- - dump a note (specified by <key>) edit                        - edit a
-   note (specified by <key>) delete         - delete
-   a note (specified by <key>) < favorite | unfavorite >             - favorite/unfavorite a
-   - retrieve the category from a note (specified by <key>) cat set <category>
-   - set the category for a note (specified by <key>)
-     cat rm  - remove category from a note (specified by <key>) ```
+ COMMANDS:
+  <none>                      - console gui mode when no command specified
+  sync                        - perform a full sync with the server
+  list [search_string]        - list notes (refined with search string)
+  export [search_string]      - export notes in JSON (refined with search string)
+  dump [search_string]        - dump notes (refined with search string)
+  create [-]                  - create a note ('-' content from stdin)
+  import [-]                  - import a note in JSON format ('-' JSON from stdin)
+  export                      - export a note in JSON format (specified by <key>)
+  dump                        - dump a note (specified by <key>)
+  edit                        - edit a note (specified by <key>)
+  delete                      - delete a note (specified by <key>)
+  < favorite | unfavorite >   - favorite/unfavorite a note (specified by <key>)
+  cat get                     - retrieve the category from a note (specified by <key>)
+  cat set <category>          - set the category for a note (specified by <key>)
+  cat rm                      - remove category from a note (specified by <key>)
+```
 
 #### Configuration
 
@@ -102,50 +108,63 @@ The current NextCloud Notes API does not support oauth authentication so
 your NextCloud Notes account information must live in the configuration
 file.  Please be sure to protect this file.
 
-nncli pulls in configuration from the `.nnclirc` file located in your
-$HOME directory. At the very least, the following example `.nnclirc`
-will get you going (using your account information):
+nncli pulls in configuration from the `config` file located in your
+$XDG_CONFIG_HOME/nncli directory. (By default,
+XDG_CONFIG_HOME=$HOME/.config.) At the very least, the following example
+`config` will get you going (using your account information):
 
-``` [nncli] cfg_sn_username = lebowski@thedude.com cfg_sn_password =
-nihilist ```
+```
+[nncli]
+cfg_nn_username = lebowski@thedude.com
+cfg_nn_password = nihilist
+cfg_nn_host     = nextcloud.thedude.com
+```
 
 Start nncli with no arguments which starts the console GUI mode. nncli
-with start sync'ing all your existing notes and you'll see log messages
-at the bottom of the console. You can view these log messages at any
-time by pressing the `l` key.
+will begin to sync your existing notes and you'll see log messages at
+the bottom of the console. You can view these log messages at any time
+by pressing the `l` key.
 
 View the help by pressing `h`. Here you'll see all the keybinds and
 configuration items. The middle column shows the config name that can be
-used in your `.nnclirc` to override the default setting.
+used in your `config` to override the default setting.
 
 See example configuration file below for more notes.
 
-``` [nncli] cfg_sn_username = lebowski@thedude.com cfg_sn_password =
-nihilist
+```
+[nncli]
+cfg_sn_username = lebowski@thedude.com
+cfg_sn_password = nihilist
 
-# as an alternate to cfg_sn_password you could use the following config
-item # any shell command can be used; its stdout is used for the
-password # trailing newlines are stripped for ease of use # note: if
-both password config are given, cfg_sn_password will be used
-cfg_sn_password_eval = gpg --quiet --for-your-eyes-only --no-tty
---decrypt ~/.nncli-pass.gpg
+# as an alternate to cfg_sn_password you could use the following config item
+# any shell command can be used; its stdout is used for the password
+# trailing newlines are stripped for ease of use
+# note: if both password config are given, cfg_sn_password will be used
+cfg_sn_password_eval = gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.nncli-pass.gpg
 
 # see http://urwid.org/manual/userinput.html for examples of more key
-combinations kb_edit_note = space kb_page_down = ctrl f
+# combinations
+kb_edit_note = space kb_page_down = ctrl f
 
-# note that values must not be quoted clr_note_focus_bg = light blue
+# note that values must not be quoted
+clr_note_focus_bg = light blue
 
-# if this editor config value is not provided, the $EDITOR env var will
-be used instead # warning: if neither $EDITOR or cfg_editor is set, it
-will be impossible to edit notes cfg_editor = nvim
+# if this editor config value is not provided, the $EDITOR env var will be
+# used instead
+# warning: if neither $EDITOR or cfg_editor is set, it will be impossible to
+# edit notes
+cfg_editor = nvim
 
-# alternatively, {fname} and/or {line} are substituted with the filename
-and # current line number in nncli's pager.  # If {fname} isn't
-supplied, the filename is simply appended.  # examples: cfg_editor =
-nvim {fname} +{line} cfg_editor = nano +{line}
+# alternatively, {fname} and/or {line} are substituted with the filename and
+# current line number in nncli's pager.
+# If {fname} isn't supplied, the filename is simply appended.
+# examples:
+cfg_editor = nvim {fname} +{line}
+cfg_editor = nano +{line}
 
-# this is also supported for the pager: cfg_pager = less -c +{line} -N
-{fname} ```
+# this is also supported for the pager:
+cfg_pager = less -c +{line} -N {fname}
+```
 
 #### Note Title Format
 
@@ -155,9 +174,14 @@ supported for dynamically building the title string. Each of these
 formatting tags supports a width specifier (decimal) and a left
 justification (-) like that supported by printf:
 
-``` %F - flags (fixed 5 char width) X - needs sync
-       * - favorited m - tags %D - date
-         %N - title ```
+```
+%F - flags (fixed 5 char width)
+     X - needs sync
+     * - favorited
+%T - category
+%D - date
+%N - title
+```
 
 The default note title format pushes the note category to the far right of
 the terminal and left justifies the note title after the date and flags:
@@ -174,7 +198,7 @@ the console user interface.
 
 At this time, nncli does not yet support 256-color terminals and is
 limited to just 16-colors. Color names that can be specified in the
-`.nnclirc` file are listed
+`config` file are listed
 [here](http://urwid.org/manual/displayattributes.html#standard-foreground-colors).
 
 ### Searching
@@ -186,18 +210,19 @@ A Google style search string is a group of tokens (separated by spaces)
 with an implied *AND* between each token. This style search is case
 insensitive. For example:
 
-``` /category:category1 category:category2 word1 "word2 word3" category:category3 ```
+`/category:category1 category:category2 word1 "word2 word3" category:category3`
 
 Regular expression searching also supports the use of flags (currently
 only case-insensitive) by adding a final forward slash followed by the
 flags. The following example will do a case-insensitive search for
 `something`:
 
-``` (regex) /something/i ```
+`(regex) /something/i`
 
 ### Creating from command line
 
-``` # create a new note and open in editor nncli create
+```
+# create a new note and open in editor nncli create
 
 # create a new note with contents of stdin echo 'hi' | nncli create -
 ```
@@ -207,7 +232,7 @@ flags. The following example will do a case-insensitive search for
 nncli can import notes from raw json data (via stdin or editor). For
 example:
 
-``` echo '{"category":"testing","content":"New note!"}' | nncli import - ```
+`echo '{"category":"testing","content":"New note!"}' | nncli import - `
 
 Allowed fields are `content`, `category`, `favorite`, and `modified`
 
@@ -215,12 +240,16 @@ Allowed fields are `content`, `category`, `favorite`, and `modified`
 
 nncli can export notes as json data to stdout. Example:
 
-``` # export a single note by id nncli -k somekeyid export
+```
+# export a single note by id
+nncli -k somekeyid export
 
-# export all notes nncli export
+# export all notes
+nncli export
 
-# export notes matching search string nncli [-r] export some search
-keywords or regex ```
+# export notes matching search string
+nncli [-r] export some search keywords or regex
+```
 
 Note that nncli still stores all the notes data in the directory
 specified by `cfg_db_path`, so for easy backups, it may be
@@ -230,7 +259,8 @@ easier/quicker to simply backup this entire directory.
 
 Note category can be modified directly from the command line. Example:
 
-``` # Retrieve note category (e.g. "category1")
+```
+# Retrieve note category (e.g. "category1")
 nncli -k somekeyid cat get
 # Returns "category1"
 
@@ -241,13 +271,14 @@ nncli -k somekeyid cat set "category3"
 # Remove a category from a note
 nncli -k somekeyid cat rm
 # Note now has no category
-
+```
 ### Tricks
 
-I personally store a lot of my notes in
-[Votl/VimOutliner](https://github.com/insanum/votl) format. Specific to
-Vim, I put a modeline at the end of these notes (note that Emacs also
-supports modelines):
+Advanced text editors usually tailor their behavior based on the file
+type being edited. For such editors, notes opened through nncli should
+be treated as Markdown by default. However, you can change this
+on a per-note basis through the use of modelines. In Vim, for instance,
+a modeline is a comment line conforming to the pattern below.
 
 ``` ; vim:ft=votl ```
 
@@ -256,10 +287,11 @@ Lots of possibilities here...
 
 ### Thanks
 
-This application pulls in and uses the
+nncli is a fork of [sncli](https://github.com/insanum/sncli) by
+[insanum](https://github.com/insanum). This application further pulls in
+and uses modified versions of the
 [simplenote.py](https://github.com/mrtazz/simplenote.py) module by
 [mrtazz](https://github.com/mrtazz) and the
 [notes_db.py](https://github.com/cpbotha/nvpy/blob/master/nvpy/notes_db.py)
 module from [nvpy](https://github.com/cpbotha/nvpy) by
 [cpbotha](https://github.com/cpbotha).
-
