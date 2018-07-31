@@ -124,6 +124,9 @@ class nncli:
             # focus position will fail if no notes available (listbox empty)
             # TODO: find a neater way to check than try/except
             pass
+        except AttributeError:
+            # we're running in CLI mode
+            pass
 
         subs = {
             'fname': fname,
@@ -959,7 +962,7 @@ class nncli:
                     sort_mode=self.config.get_config('sort_mode'))
         for n in note_list:
             flags = utils.get_note_flags(n.note)
-            print((n.key + \
+            print((str(n.key) + \
                   ' [' + flags + '] ' + \
                   utils.get_note_title(n.note)))
 
@@ -980,7 +983,7 @@ class nncli:
 
         print(sep)
         print(('| {:<' + str(w) + '} |').format(('    Title: ' + title)[:w]))
-        print(('| {:<' + str(w) + '} |').format(('      Key: ' + note.get('id', 'Localkey: {}'.format(note.get('localkey'))))[:w]))
+        print(('| {:<' + str(w) + '} |').format(('      Key: ' + str(note.get('id', 'Localkey: {}'.format(note.get('localkey'))))[:w])))
         print(('| {:<' + str(w) + '} |').format(('     Date: ' + mod_time)[:w]))
         print(('| {:<' + str(w) + '} |').format(('     Category: ' + category)[:w]))
         print(('| {:<' + str(w) + '} |').format(('    Flags: [' + flags + ']')[:w]))
@@ -1122,7 +1125,7 @@ class nncli:
 
         old_category = self.cli_note_category_get(key)
         if old_category:
-            self.cli_note_category_set(key, None)
+            self.cli_note_category_set(key, '')
 
 def SIGINT_handler(signum, frame):
     print('\nSignal caught, bye!')
@@ -1190,7 +1193,10 @@ def main(argv=sys.argv[1:]):
         elif opt in [ '-r', '--regex']:
             regex = True
         elif opt in [ '-k', '--key']:
-            key = arg
+            try:
+                key = int(arg)
+            except:
+                print('ERROR: Key specified with -k must be an integer')
         elif opt in [ '-t', '--title']:
             title = arg
         elif opt in [ '-c', '--config']:
