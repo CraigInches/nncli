@@ -31,9 +31,14 @@ import nnotes_cli
 
 deps = ['urwid', 'requests']
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
       name=nnotes_cli.__productname__,
       description=nnotes_cli.__description__,
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       version=nnotes_cli.__version__,
       author=nnotes_cli.__author__,
       author_email=nnotes_cli.__author_email__,
