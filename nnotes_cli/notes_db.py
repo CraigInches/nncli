@@ -306,9 +306,8 @@ class NotesDB():
         if not isinstance(new_note['content'], str):
             raise ValueError('"content" must be a string')
 
-        for n in (new_note['modified']):
-            if not 0 <= n <= timestamp:
-                raise ValueError('date fields must be real')
+        if not 0 <= new_note['modified'] <= timestamp:
+            raise ValueError('"modified" field must be real')
 
         if not isinstance(new_note['category'], str) or \
                 new_note['category'] is None:
