@@ -4,7 +4,7 @@ nncli
 NextCloud Notes Command Line Interface
 
 nncli is a Python application that gives you access to your NextCloud
-Notes account via the command line. It's a fork of
+Notes account via the command line. It's a "hard" fork of
 [sncli](https://github.com/insanum/sncli). You can access your notes via
 a customizable console GUI that implements vi-like keybinds or via a
 simple command line interface that you can script.
@@ -105,12 +105,13 @@ Usage:
 #### Configuration
 
 The current NextCloud Notes API does not support oauth authentication so
-your NextCloud Notes account information must live in the configuration
-file.  Please be sure to protect this file.
+your NextCloud Notes account password must be stored someplace
+accessible to nncli. Use of the `cfg_nn_password_eval` option is
+recommended (see below).
 
 nncli pulls in configuration from the `config` file located in your
-$XDG_CONFIG_HOME/nncli directory. (By default,
-XDG_CONFIG_HOME=$HOME/.config.) At the very least, the following example
+`$XDG_CONFIG_HOME/nncli` directory. (By default,
+`XDG_CONFIG_HOME=$HOME/.config`.) At the very least, the following example
 `config` will get you going (using your account information):
 
 ```
@@ -133,14 +134,15 @@ See example configuration file below for more notes.
 
 ```
 [nncli]
-cfg_sn_username = lebowski@thedude.com
-cfg_sn_password = nihilist
+cfg_nn_username = lebowski@thedude.com
+cfg_nn_password = nihilist
+cfg_nn_host     = nextcloud.thedude.com
 
-# as an alternate to cfg_sn_password you could use the following config item
+# as an alternate to cfg_nn_password you could use the following config item
 # any shell command can be used; its stdout is used for the password
 # trailing newlines are stripped for ease of use
-# note: if both password config are given, cfg_sn_password will be used
-cfg_sn_password_eval = gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.nncli-pass.gpg
+# note: if both password config are given, cfg_nn_password will be used
+cfg_nn_password_eval = gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.nncli-pass.gpg
 
 # see http://urwid.org/manual/userinput.html for examples of more key
 # combinations
@@ -222,9 +224,11 @@ flags. The following example will do a case-insensitive search for
 ### Creating from command line
 
 ```
-# create a new note and open in editor nncli create
+# create a new note and open in editor
+nncli create
 
-# create a new note with contents of stdin echo 'hi' | nncli create -
+# create a new note with contents of stdin
+echo 'hi' | nncli create -
 ```
 
 ### Importing
