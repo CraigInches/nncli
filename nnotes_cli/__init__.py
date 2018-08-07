@@ -1,5 +1,5 @@
 __productname__ = 'nncli'
-__version__ = '0.1.1'
+__version__ = '0.1.2-dev'
 __copyright__ = "Copyright (c) 2018 Daniel Moch"
 __author__ = "Daniel Moch"
 __author_email__ = "daniel@danielmoch.com"

@@ -28,6 +28,7 @@
 import os, sys, getopt, re, signal, time, datetime, shlex, hashlib
 import subprocess, threading, logging
 import copy, json, urwid, datetime
+import nnotes_cli
 from . import view_titles, view_note, view_help, view_log, user_input
 from . import utils, temp
 from .config import Config
@@ -1147,26 +1148,45 @@ Usage:
   -t <title>, --title=<title> - title of note for create (cli mode)
   -c <file>, --config=<file>  - config file to read from (defaults to
                                 ~/.config/nncli/config)
+  --version                   - version information
 
  COMMANDS:
   <none>                      - console gui mode when no command specified
   sync                        - perform a full sync with the server
   list [search_string]        - list notes (refined with search string)
-  export [search_string]      - export notes in JSON (refined with search string)
+  export [search_string]      - export notes in JSON (refined with search
+                                string)
   dump [search_string]        - dump notes (refined with search string)
   create [-]                  - create a note ('-' content from stdin)
-  import [-]                  - import a note in JSON format ('-' JSON from stdin)
-  export                      - export a note in JSON format (specified by <key>)
+  import [-]                  - import a note in JSON format ('-' JSON from
+                                stdin)
+  export                      - export a note in JSON format (specified by
+                                <key>)
   dump                        - dump a note (specified by <key>)
   edit                        - edit a note (specified by <key>)
   delete                      - delete a note (specified by <key>)
   < favorite | unfavorite >   - favorite/unfavorite a note (specified by <key>)
-  cat get                     - retrieve the category from a note (specified by <key>)
+  cat get                     - retrieve the category from a note (specified
+                                by <key>)
   cat set <category>          - set the category for a note (specified by <key>)
   cat rm                      - remove category from a note (specified by <key>)
 ''')
     sys.exit(0)
 
+def version():
+    version_info = ''
+    version_info += nnotes_cli.__productname__ + ' v' + \
+            nnotes_cli.__version__ + "\n"
+    version_info += nnotes_cli.__description__ + "\n\n"
+    version_info += nnotes_cli.__copyright__ + "\n"
+    version_info += "Written by " + nnotes_cli.__author__ + \
+            " and others\n"
+    version_info += "Licensed under the terms of the " + \
+            nnotes_cli.__license__ + " license\n"
+    version_info += "The latest code is available at: " + \
+            nnotes_cli.__url__
+    print(version_info)
+    exit(0)
 
 def main(argv=sys.argv[1:]):
     verbose = False
@@ -1179,13 +1199,16 @@ def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv,
             'hvnrk:t:c:',
-            [ 'help', 'verbose', 'nosync', 'regex', 'key=', 'title=', 'config=' ])
+            [ 'help', 'verbose', 'nosync', 'regex', 'key=', 'title=', \
+                'config=', 'version' ])
     except:
         usage()
 
     for opt, arg in opts:
         if opt in [ '-h', '--help']:
             usage()
+        elif opt in [ '--version' ]:
+            version()
         elif opt in [ '-v', '--verbose']:
             verbose = True
         elif opt in [ '-n', '--nosync']:
