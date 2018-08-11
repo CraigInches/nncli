@@ -39,13 +39,14 @@ setup(
       description=nnotes_cli.__description__,
       long_description=long_description,
       long_description_content_type="text/markdown",
-      version=nnotes_cli.__version__,
       author=nnotes_cli.__author__,
       author_email=nnotes_cli.__author_email__,
       url=nnotes_cli.__url__,
       license=nnotes_cli.__license__,
       requires=deps,
       install_requires=deps,
+      use_scm_version= {'write_to': 'nnotes_cli/version.py'},
+      setup_requires=['setuptools_scm'],
       packages=['nnotes_cli'],
       entry_points={
           'console_scripts': [
