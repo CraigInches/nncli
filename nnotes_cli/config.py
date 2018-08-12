@@ -55,6 +55,7 @@ class Config:
         {
          'cfg_nn_username'       : '',
          'cfg_nn_password'       : '',
+         'cfg_nn_password_eval'  : '',
          'cfg_db_path'           : self.cache_home,
          'cfg_search_categories' : 'yes',  # with regex searches
          'cfg_sort_mode'         : 'date', # 'alpha' or 'date'

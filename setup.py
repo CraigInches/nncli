@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 # The MIT License (MIT)
 #
@@ -29,7 +28,8 @@
 from setuptools import setup
 import nnotes_cli
 
-deps = ['urwid', 'requests']
+deps = open('requirements.txt').readlines()
+test_deps = open('requirements-test.txt').readlines()
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -45,6 +45,7 @@ setup(
       license=nnotes_cli.__license__,
       requires=deps,
       install_requires=deps,
+      tests_require=test_deps,
       use_scm_version= {'write_to': 'nnotes_cli/version.py'},
       setup_requires=['setuptools_scm'],
       packages=['nnotes_cli'],
