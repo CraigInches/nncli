@@ -1146,8 +1146,7 @@ Usage:
   -r, --regex                 - search string is a regular expression
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
-  -c <file>, --config=<file>  - config file to read from (defaults to
-                                ~/.config/nncli/config)
+  -c <file>, --config=<file>  - config file to read from
   --version                   - version information
 
  COMMANDS:

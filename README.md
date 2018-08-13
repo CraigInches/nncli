@@ -82,6 +82,7 @@ Usage:
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
   -c <file>, --config=<file>  - config file to read from
+  --version                   - version information
 
  COMMANDS:
   <none>                      - console gui mode when no command specified
