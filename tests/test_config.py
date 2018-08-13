@@ -22,6 +22,7 @@
 # SOFTWARE.
 #
 import os
+import sys
 
 from nnotes_cli.config import Config
 from pytest import raises
@@ -29,25 +30,17 @@ from pytest import raises
 def test_init():
     config = Config()
 
-    assert config.home == os.path.abspath(os.path.expanduser('~'))
+    if sys.platform == 'linux':
+        assert config.config_home == os.path.join(os.path.expanduser('~'), \
+                '.config', 'nncli')
+        assert config.cache_home == os.path.join(os.path.expanduser('~'), \
+                '.cache', 'nncli')
+    if sys.platform == 'darwin':
+        assert config.config_home == os.path.join(os.path.expanduser('~'), \
+                'Library', 'Preferences', 'nncli')
+        assert config.cache_home == os.path.join(os.path.expanduser('~'), \
+                'Library', 'Caches', 'nncli')
 
-    if 'XDG_CONFIG_HOME' in os.environ:
-        del(os.environ['XDG_CONFIG_HOME'])
-    else:
-        os.environ['XDG_CONFIG_HOME'] = 'foo'
-
-    config = Config()
-
-    assert config.home == os.path.abspath(os.path.expanduser('~'))
-
-    if 'XDG_CACHE_HOME' in os.environ:
-        del(os.environ['XDG_CACHE_HOME'])
-    else:
-        os.environ['XDG_CACHE_HOME'] = 'bar'
-
-    config = Config()
-
-    assert config.home == os.path.abspath(os.path.expanduser('~'))
 
 def test_custom_file():
     with open('test_cfg', 'w') as config_file:

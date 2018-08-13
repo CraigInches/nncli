@@ -27,30 +27,14 @@
 
 import os, sys, urwid, collections, configparser, subprocess
 
+from appdirs import user_cache_dir, user_config_dir
+
 class Config:
 
     def __init__(self, custom_file=None):
-        self.home = os.path.abspath(os.path.expanduser('~'))
-        if 'XDG_CONFIG_HOME' in os.environ.keys():
-            self.config_home = \
-                    os.path.join(os.environ['XDG_CONFIG_HOME'], 'nncli')
-        else:
-            self.config_home = \
-                    os.path.join(
-                            os.path.expanduser('~'),
-                            '.config',
-                            'nncli'
-                            )
-        if 'XDG_CACHE_HOME' in os.environ.keys():
-            self.cache_home = \
-                    os.path.join(os.environ['XDG_CACHE_HOME'], 'nncli')
-        else:
-            self.cache_home = \
-                    os.path.join(
-                            os.path.expanduser('~'),
-                            '.cache',
-                            'nncli'
-                            )
+        self.config_home = user_config_dir('nncli', 'djmoch')
+        self.cache_home = user_cache_dir('nncli', 'djmoch')
+
         defaults = \
         {
          'cfg_nn_username'       : '',
