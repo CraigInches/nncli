@@ -81,8 +81,7 @@ Usage:
   -r, --regex                 - search string is a regular expression
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
-  -c <file>, --config=<file>  - config file to read from (defaults to
-                                ~/.config/nncli/config)
+  -c <file>, --config=<file>  - config file to read from
 
  COMMANDS:
   <none>                      - console gui mode when no command specified
@@ -109,10 +108,9 @@ your NextCloud Notes account password must be stored someplace
 accessible to nncli. Use of the `cfg_nn_password_eval` option is
 recommended (see below).
 
-nncli pulls in configuration from the `config` file located in your
-`$XDG_CONFIG_HOME/nncli` directory. (By default,
-`XDG_CONFIG_HOME=$HOME/.config`.) At the very least, the following example
-`config` will get you going (using your account information):
+nncli pulls in configuration from the `config` file located in the
+standard location for your platform. At the very least, the following
+example `config` will get you going (using your account information):
 
 ```
 [nncli]
@@ -146,7 +144,8 @@ cfg_nn_password_eval = gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.nn
 
 # see http://urwid.org/manual/userinput.html for examples of more key
 # combinations
-kb_edit_note = space kb_page_down = ctrl f
+kb_edit_note = space
+kb_page_down = ctrl f
 
 # note that values must not be quoted
 clr_note_focus_bg = light blue
