@@ -28,8 +28,8 @@
 from setuptools import setup
 import nnotes_cli
 
-deps = open('requirements.txt').readlines()
-test_deps = open('requirements-test.txt').readlines()
+deps = ['urwid', 'requests', 'appdirs']
+test_deps = ['pytest', 'pytest-cov', 'pytest-runner', 'pytest-mock']
 
 with open("README.md", "r") as fh:
     long_description = fh.read()

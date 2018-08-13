@@ -32,7 +32,6 @@ Check your OS distribution for installation packages.
 * Manually:
   - Clone this repository to your hard disk: `git clone
     https://github.com/djmoch/nncli.git`
-  - Install the requirements `pip3 install -r requirements.txt`
   - Install _nncli_: `python3 setup.py install`
 
 ### Features
