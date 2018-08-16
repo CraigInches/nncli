@@ -1147,7 +1147,7 @@ Usage:
   -k <key>, --key=<key>       - note key
   -t <title>, --title=<title> - title of note for create (cli mode)
   -c <file>, --config=<file>  - config file to read from
-  --version                   - version information
+  -V, --version               - version information
 
  COMMANDS:
   <none>                      - console gui mode when no command specified
@@ -1197,7 +1197,7 @@ def main(argv=sys.argv[1:]):
 
     try:
         opts, args = getopt.getopt(argv,
-            'hvnrk:t:c:',
+            'hvnrk:t:c:V',
             [ 'help', 'verbose', 'nosync', 'regex', 'key=', 'title=', \
                 'config=', 'version' ])
     except:
@@ -1206,7 +1206,7 @@ def main(argv=sys.argv[1:]):
     for opt, arg in opts:
         if opt in [ '-h', '--help']:
             usage()
-        elif opt in [ '--version' ]:
+        elif opt in ['-V', '--version' ]:
             version()
         elif opt in [ '-v', '--verbose']:
             verbose = True
