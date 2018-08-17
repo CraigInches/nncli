@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+appdirs = "*"
+requests = "*"
+urwid = "*"
+setuptools = "*"
+setuptools-scm = "*"
+pytest-runner = "*"
+
+[dev-packages]
+pytest = "<3.7.0"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-pylint = "*"
+pudb = "*"
+
+[requires]
+python_version = "3.7"
