@@ -227,14 +227,17 @@ class NextcloudNote(object):
             note_list = res.json()
             self.status = 'online'
         except ConnectionError as e:
+            logging.exception('connection error')
             self.status = 'offline, connection error'
             status = -1
         except RequestException as e:
             # if problem with network request/response
+            logging.exception('request error')
             status = -1
         except ValueError as e:
             # if invalid json data
             status = -1
+            logging.exception('request returned bad JSON data')
 
         # Can only filter for category at end, once all notes have been
         # retrieved. Below based on simplenote.vim, except we return
