@@ -142,10 +142,11 @@ class NextcloudNote(object):
         try:
             logging.debug('NOTE: ' + str(note))
             if url != self.url:
-                res = requests.put(url, auth=(self.username, self.password), data=note)
+                res = requests.put(url, auth=(self.username,
+                    self.password), json=note)
             else:
                 res = requests.post(url, auth=(self.username,
-                    self.password), data=note)
+                    self.password), json=note)
             note = res.json()
             res.raise_for_status()
             logging.debug('NOTE (from response): ' + str(res.json()))
