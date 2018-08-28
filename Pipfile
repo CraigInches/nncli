@@ -9,14 +9,11 @@ requests = "*"
 urwid = "*"
 setuptools = "*"
 setuptools-scm = "*"
-pytest-runner = "*"
 
 [dev-packages]
-pytest = "<3.7.0"
+pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
-pytest-pylint = "*"
+pytest-runner = "*"
+pylint = "*"
 pudb = "*"
-
-[requires]
-python_version = "3.7"
