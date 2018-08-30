@@ -1,6 +1,9 @@
 nncli
 =====
 
+![GitHub](https://img.shields.io/github/license/djmoch/nncli.svg)
+[![PyPI](https://img.shields.io/pypi/v/nncli.svg)](https://pypi.org/project/nncli/)
+
 NextCloud Notes Command Line Interface
 
 nncli is a Python application that gives you access to your NextCloud
@@ -33,6 +36,10 @@ Check your OS distribution for installation packages.
   - Clone this repository to your hard disk: `git clone
     https://github.com/djmoch/nncli.git`
   - Install _nncli_: `python3 setup.py install`
+* Development:
+  - Clone the repo
+  - Install Pipenv: `pip install pipenv`
+  - Stand up development environment: `pipenv install --dev`
 
 ### Features
 
