@@ -1,3 +1,5 @@
+.. _configuration:
+
 Configuration
 =============
 
@@ -5,6 +7,11 @@ The current NextCloud Notes API does not support oauth authentication so
 your NextCloud Notes account password must be stored someplace
 accessible to nncli. Use of the ``cfg_nn_password_eval`` option is
 recommended (see below).
+
+.. _config-file:
+
+Configuration File
+------------------
 
 nncli pulls in configuration from the ``config`` file located in the
 standard location for your platform. At the very least, the following
