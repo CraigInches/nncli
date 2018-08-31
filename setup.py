@@ -48,6 +48,7 @@ setup(
       tests_require=test_deps,
       use_scm_version= {'write_to': 'nnotes_cli/version.py'},
       setup_requires=['setuptools_scm'],
+      extras_require={'docs': ['sphinx']},
       packages=['nnotes_cli'],
       entry_points={
           'console_scripts': [
