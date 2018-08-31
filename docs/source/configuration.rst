@@ -8,7 +8,9 @@ recommended (see below).
 
 nncli pulls in configuration from the ``config`` file located in the
 standard location for your platform. At the very least, the following
-example ``config`` will get you going (using your account information)::
+example ``config`` will get you going (using your account information):
+
+.. code-block:: ini
 
    [nncli]
    cfg_nn_username = lebowski@thedude.com
@@ -26,41 +28,41 @@ used in your ``config`` to override the default setting.
 
 See example configuration file below for more notes.
 
-::
+.. code-block:: ini
 
    [nncli]
    cfg_nn_username = lebowski@thedude.com
    cfg_nn_password = nihilist
    cfg_nn_host     = nextcloud.thedude.com
 
-   # as an alternate to cfg_nn_password you could use the following config item
-   # any shell command can be used; its stdout is used for the password
-   # trailing newlines are stripped for ease of use
-   # note: if both password config are given, cfg_nn_password will be used
+   ; as an alternate to cfg_nn_password you could use the following config item
+   ; any shell command can be used; its stdout is used for the password
+   ; trailing newlines are stripped for ease of use
+   ; note: if both password config are given, cfg_nn_password will be used
    cfg_nn_password_eval = gpg --quiet --for-your-eyes-only --no-tty --decrypt ~/.nncli-pass.gpg
 
-   # see http://urwid.org/manual/userinput.html for examples of more key
-   # combinations
+   ; see http://urwid.org/manual/userinput.html for examples of more key
+   ; combinations
    kb_edit_note = space
    kb_page_down = ctrl f
 
-   # note that values must not be quoted
+   ; note that values must not be quoted
    clr_note_focus_bg = light blue
 
-   # if this editor config value is not provided, the $EDITOR env var will be
-   # used instead
-   # warning: if neither $EDITOR or cfg_editor is set, it will be impossible to
-   # edit notes
+   ; if this editor config value is not provided, the $EDITOR env var will be
+   ; used instead
+   ; warning: if neither $EDITOR or cfg_editor is set, it will be impossible to
+   ; edit notes
    cfg_editor = nvim
 
-   # alternatively, {fname} and/or {line} are substituted with the filename and
-   # current line number in nncli's pager.
-   # If {fname} isn't supplied, the filename is simply appended.
-   # examples:
+   ; alternatively, {fname} and/or {line} are substituted with the filename and
+   ; current line number in nncli's pager.
+   ; If {fname} isn't supplied, the filename is simply appended.
+   ; examples:
    cfg_editor = nvim {fname} +{line}
    cfg_editor = nano +{line}
 
-   # this is also supported for the pager:
+   ; this is also supported for the pager:
    cfg_pager = less -c +{line} -N {fname}
 
 .. index:: single: configuration; gui titles
@@ -83,7 +85,9 @@ justification (-) like that supported by printf::
 
 The default note title format pushes the note category to the far right of
 the terminal and left justifies the note title after the date and
-flags::
+flags:
+
+.. code-block:: ini
 
    cfg_format_note_title = '[%D] %F %-N %T'
 
