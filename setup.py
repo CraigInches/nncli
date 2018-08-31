@@ -31,14 +31,14 @@ import nnotes_cli
 deps = ['urwid', 'requests', 'appdirs']
 test_deps = ['pytest', 'pytest-cov', 'pytest-runner', 'pytest-mock']
 
-with open("README.md", "r") as fh:
+with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(
       name=nnotes_cli.__productname__,
       description=nnotes_cli.__description__,
       long_description=long_description,
-      long_description_content_type="text/markdown",
+      long_description_content_type="text/x-rst",
       author=nnotes_cli.__author__,
       author_email=nnotes_cli.__author_email__,
       url=nnotes_cli.__url__,
