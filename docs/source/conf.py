@@ -41,6 +41,7 @@ release = nnotes_cli.__version__
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
+    'sphinx.ext.intersphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -159,7 +160,19 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 
+# -- Options for intersphinx extension ---------------------------------------
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Extension interface -----------------------------------------------------
+def setup(app):
+    from sphinx.ext.autodoc import cut_lines
+    from sphinx.util.docfields import GroupedField
+    app.connect('autodoc-process-docstring', cut_lines(4, what=['module']))
+    app.add_object_type('confval', 'confval',
+                        objname='configuration value',
+                        indextemplate='pair: %s; configuration value')
