@@ -107,8 +107,8 @@ Features
 
   - view and edit note category
 
-Thanks
-~~~~~~
+Acknowledgements
+~~~~~~~~~~~~~~~~
 
 nncli is a fork of sncli_ by Eric Davis. This application further pulls in
 and uses modified versions of the simplenote.py_ module by Daniel Schauenberg and
