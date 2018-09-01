@@ -1,7 +1,9 @@
 .. image:: https://img.shields.io/pypi/v/nncli.svg
    :alt: PyPI
-.. image:: https://img.shields.io/readthedocs/nncli.svg?logo=Read%20The%20Docs&logoColor=white
+   :target: https://pypi.org/project/nncli
+.. image:: https://img.shields.io/readthedocs/nncli.svg
    :alt: Read the Docs
+   :target: https://nncli.readthedocs.io
 
 nncli is a Python application that gives you access to your NextCloud
 Notes account via the command line. It's a "hard" fork of
@@ -13,7 +15,7 @@ Notes can be viewed/created/edited in *both an* **online** *and*
 **offline** *mode*. All changes are saved to a local cache on disk and
 automatically sync'ed when nncli is brought online.
 
-More detailed documentation can be found on the documentation_ page.
+More detailed documentation can be found in the docs.
 
 Requirements
 ~~~~~~~~~~~~
@@ -120,4 +122,3 @@ the notes_db.py module from nvpy_ by Charl P. Botha.
 .. _Requests: https://requests.readthedocs.org/en/master
 .. _simplenote.py: https://github.com/mrtazz/simplenote.py
 .. _nvpy: https://github.com/cpbotha/nvpy
-.. _documentation: https://nncli.readthedocs.io/en/latest
