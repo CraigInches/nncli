@@ -1,0 +1,6 @@
+[run]
+branch = True
+omit = hookmeup/__main__.py
+
+[report]
+show_missing = True
