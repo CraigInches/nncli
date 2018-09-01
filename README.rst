@@ -1,6 +1,5 @@
 .. image:: https://img.shields.io/pypi/v/nncli.svg
    :alt: PyPI
-
 .. image:: https://img.shields.io/readthedocs/nncli.svg?logo=Read%20The%20Docs&logoColor=white
    :alt: Read the Docs
 
