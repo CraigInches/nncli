@@ -1,3 +1,9 @@
+.. image:: https://img.shields.io/pypi/v/nncli.svg
+   :alt: PyPI
+
+.. image:: https://img.shields.io/readthedocs/nncli.svg?logo=Read%20The%20Docs&logoColor=white
+   :alt: Read the Docs
+
 nncli is a Python application that gives you access to your NextCloud
 Notes account via the command line. It's a "hard" fork of
 sncli_. You can access your notes via
@@ -11,7 +17,7 @@ automatically sync'ed when nncli is brought online.
 More detailed documentation can be found on the documentation_ page.
 
 Requirements
-------------
+~~~~~~~~~~~~
 
 - `Python 3`_
 
@@ -22,7 +28,7 @@ Requirements
 - A love for the command line!
 
 Installation
-------------
+~~~~~~~~~~~~
 
 - Via pip (latest release):
 
@@ -44,7 +50,7 @@ Installation
   - Stand up development environment: ``pipenv install --dev``
 
 Features
---------
+~~~~~~~~
 
 - Console GUI
 
@@ -102,13 +108,12 @@ Features
 
   - view and edit note category
 
-
 Thanks
-------
+~~~~~~
 
-nncli is a fork of sncli_ by insanum. This application further pulls in
-and uses modified versions of the simplenote.py_ module by mrtazz and
-the notes_db.py module from nvpy_ by cpbotha.
+nncli is a fork of sncli_ by Eric Davis. This application further pulls in
+and uses modified versions of the simplenote.py_ module by Daniel Schauenberg and
+the notes_db.py module from nvpy_ by Charl P. Botha.
 
 .. _sncli: https://github.com/insanum/sncli
 .. _Python 3: http://python.org
