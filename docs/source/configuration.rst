@@ -13,6 +13,11 @@ recommended (see :ref:`config-file`).
 Configuration File
 ------------------
 
+.. _config-file:
+
+Configuration File
+------------------
+
 nncli pulls in configuration from the ``config`` file located in the
 standard location for your platform.
 
