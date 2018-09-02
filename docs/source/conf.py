@@ -170,9 +170,6 @@ todo_include_todos = True
 
 # -- Extension interface -----------------------------------------------------
 def setup(app):
-    from sphinx.ext.autodoc import cut_lines
-    from sphinx.util.docfields import GroupedField
-    app.connect('autodoc-process-docstring', cut_lines(4, what=['module']))
     app.add_object_type('confval', 'confval',
                         objname='configuration value',
                         indextemplate='pair: %s; configuration value')

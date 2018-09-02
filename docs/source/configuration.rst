@@ -13,11 +13,6 @@ recommended (see :ref:`config-file`).
 Configuration File
 ------------------
 
-.. _config-file:
-
-Configuration File
-------------------
-
 nncli pulls in configuration from the ``config`` file located in the
 standard location for your platform.
 
@@ -188,81 +183,259 @@ General Options
 Keybindings
 ~~~~~~~~~~~
 
+Keybindings specify the behavior of the console GUI, and are never
+required in the ``config`` file. However, they all have default values,
+as outlined below.
+
 .. confval:: kb_help
+
+   Press to enter the help screen.
+
+   Default value: ``h``
 
 .. confval:: kb_quit
 
+   Press to exit the console GUI.
+
+   Default value: ``q``
+
 .. confval:: kb_sync
+
+   Press to force a full, bi-directional sync with the server.
+
+   Default value: ``S``
 
 .. confval:: kb_down
 
+   Press to move down one row.
+
+   Default value: ``j``
+
 .. confval:: kb_up
+
+   Press to move one row up.
+
+   Default value: ``k``
 
 .. confval:: kb_page_down
 
+   Press to move one page down.
+
+   Default value: ``space``
+
 .. confval:: kb_page_up
+
+   Press to move one page up.
+
+   Default value: ``b``
 
 .. confval:: kb_half_page_down
 
+   Press to move one half-page down.
+
+   Default value: ``ctrl d``
+
 .. confval:: kb_half_page_up
+
+   Press to move one half-page up.
+
+   Default value: ``ctrl u``
 
 .. confval:: kb_bottom
 
+   Press to move to the last line.
+
+   Default value: ``G``
+
 .. confval:: kb_top
+
+   Press to move to the first line.
+
+   Default value: ``g``
 
 .. confval:: kb_status
 
+   Press to toggle the visibility of the status bar.
+
+   Default value: ``s``
+
 .. confval:: kb_create_note
+
+   Press to create a new note and open in the configured editor (see
+   :confval:`cfg_editor`).
+
+   Default value: ``C``
 
 .. confval:: kb_edit_note
 
+   Press to edit the highlighted note in the configured editor (see
+   :confval:`cfg_editor`).
+
+   Default value: ``e``
+
 .. confval:: kb_view_note
+
+   Press to view the highlighted note in read-only mode.
+
+   Default value: ``enter``
 
 .. confval:: kb_view_note_ext
 
+   Press to view the highlighted note in the configured pager (see
+   :confval:`cfg_pager`).
+
+   Default value: ``meta enter``
+
 .. confval:: kb_view_note_json
+
+   Press to view the raw JSON contents of the highlighted note in
+   read-only mode.
+
+   Default value: ``O``
 
 .. confval:: kb_pipe_note
 
+   Press to send the contents of the highlighted note to ``stdin`` of
+   another program. A small command window opens at the bottom of the
+   screen to enter the desired program.
+
+   Default value: ``|``
+
 .. confval:: kb_view_next_note
+
+   Press to view the contents of the next note in read-only mode.
+
+   Default value: ``J``
 
 .. confval:: kb_view_prev_note
 
+   Press to view the contents of the previous note in read-only mode.
+
+   Default value: ``K``
+
 .. confval:: kb_view_log
+
+   Press to view the log.
+
+   Default value: ``l``
 
 .. confval:: kb_tabstop2
 
+   Press to set the tabstop for the internal pager to a width of two
+   characters.
+
+   Default value: ``2``
+
 .. confval:: kb_tabstop4
+
+   Press to set the tabstop for the internal pager to a width of four
+   characters.
+
+   Default value: ``4``
 
 .. confval:: kb_tabstop8
 
+   Press to set the tabstop for the internal pager to a width of eight
+   characters.
+
+   Default value: ``8``
+
 .. confval:: kb_search_gstyle
+
+   Press to initiate a search of your notes against a Google-style
+   search term. A command window will open at the bottom of the screen
+   to enter your search term.
+
+   Default value: ``/``
 
 .. confval:: kb_search_regex
 
+   Press to initiate a search of your notes against a regular
+   expression. A command window will open at the bottom of the screen to
+   enter your search term.
+
+   Default value: ``meta /``
+
 .. confval:: kb_search_prev_gstyle
+
+   Press to initiate a reverse search of your notes against a
+   Google-style search term. A command window will open at the bottom of
+   the screen to enter your search term.
+
+   Default value: ``?``
 
 .. confval:: kb_search_prev_regex
 
+   Press to initiate a reverse search of your notes against a regular
+   expression.  A command window will open at the bottom of the screen
+   to enter your search term.
+
+   Default value: ``meta ?``
+
 .. confval:: kb_search_next
+
+   Press after a search has been initiated to move to the next match.
+
+   Default value: ``n``
 
 .. confval:: kb_search_prev
 
+   Press after a search has been initiated to move to the previous
+   match.
+
+   Default value: ``N``
+
 .. confval:: kb_clear_search
+
+   Press to clear the current search.
+
+   Default value: ``A``
 
 .. confval:: kb_sort_date
 
+   Press to display notes sorted by date.
+
+   Default value: ``d``
+
 .. confval:: kb_sort_alpha
+
+   Press to display notes sorted alphabetically.
+
+   Default value: ``a``
 
 .. confval:: kb_sort_categories
 
+   Press to display notes sorted by category.
+
+   Default value: ``ctrl t``
+
 .. confval:: kb_note_delete
+
+   Press to delete a note. The note will be deleted locally and
+   reflected on the server after the next full sync (see
+   :confval:`kb_sync`).
+
+   Default value: ``D``
 
 .. confval:: kb_note_favorite
 
+   Press to toggle the ``favorite`` flag for a note.
+
+   Default value: ``p``
+
 .. confval:: kb_note_category
 
+   Press to set/edit the note category. A command window will appear at
+   the bottom of the screen containing the current category (if it has
+   one). Set to an empty string to clear the category.
+
+   Default value: ``t``
+
 .. confval:: kb_copy_note_text
+
+   Press to copy the note text to the system clipboard.
+
+   Default value: ``y``
 
 Colors
 ~~~~~~
