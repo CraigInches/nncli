@@ -14,6 +14,7 @@ def mock_nncli(mocker):
     mocker.patch('nncli.nncli.NotesDB')
     mocker.patch('os.mkdir')
     mocker.patch.object(RotatingFileHandler, '_open')
+    mocker.patch('subprocess.check_output')
 
 def mock_get_config(mocker, return_list):
     mocker.patch.object(
