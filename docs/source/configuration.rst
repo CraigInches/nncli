@@ -8,6 +8,8 @@ your NextCloud Notes account password must be stored someplace
 accessible to nncli. Use of the ``cfg_nn_password_eval`` option is
 recommended (see :ref:`config-file`).
 
+.. index:: single: configuration file
+
 .. _config-file:
 
 Configuration File
@@ -16,9 +18,16 @@ Configuration File
 nncli pulls in configuration from the ``config`` file located in the
 standard location for your platform.
 
-.. todo:: Add platform-specific location information
+- Windows: ``%USERPROFILE%\AppData\Local\djmoch\nncli``
+
+- macOS: ``~/Library/Preferences/nncli``
+
+- \*nix: ``$XDG_CONFIG_HOME/nncli/config`` or
+  ``$HOME/.config/nncli/config``
 
 The following directives are accepted within the ``config`` file:
+
+.. index:: pair: configuration file; general options
 
 General Options
 ~~~~~~~~~~~~~~~
@@ -179,6 +188,8 @@ General Options
    folder.
 
    Optional. Default value: *[blank]*
+
+.. index:: pair: configuration file; keybindings
 
 Keybindings
 ~~~~~~~~~~~
@@ -437,96 +448,219 @@ as outlined below.
 
    Default value: ``y``
 
+.. index:: pair: configuration file; colors
+
 Colors
 ~~~~~~
+
+nncli utilizes the Python Urwid_ module to implement the console user
+interface.
+
+At this time, nncli does not yet support 256-color terminals and is
+limited to just 16-colors. Color names that can be specified in the
+``config`` file are listed :ref:`here <urwid:16-standard-foreground>`.
+
+The following pairs of configuration values represent the foreground and
+background colors for different elements of the console GUI. In each
+case the configuration value corresponding to the foreground color ends
+in ``_fg``, and the configuration value corresponding to the
+background color ends in ``_bg``. The default color values are listed in
+foreground/background format.
+
+.. _Urwid: http://urwid.org
 
 .. confval:: clr_default_fg
 
 .. confval:: clr_default_bg
 
+   The default foreground/background colors.
+
+   Default values: ``default/default``
+
 .. confval:: clr_status_bar_fg
 
 .. confval:: clr_status_bar_bg
+
+   The foreground/background colors for the status bar.
+
+   Default values: ``dark gray/light gray``
 
 .. confval:: clr_log_fg
 
 .. confval:: clr_log_bg
 
+   The foreground/background colors for the log.
+
+   Default values: ``dark gray/light gray``
+
 .. confval:: clr_user_input_bar_fg
 
 .. confval:: clr_user_input_bar_bg
+
+   The foreground/background colors for the input bar.
+
+   Default values: ``white/light red``
 
 .. confval:: clr_note_focus_fg
 
 .. confval:: clr_note_focus_bg
 
+   The foreground/background colors for the selected note.
+
+   Default values: ``white/light red``
+
 .. confval:: clr_note_title_day_fg
 
 .. confval:: clr_note_title_day_bg
+
+   The foreground/background colors for notes edited within the past 24
+   hours.
+
+   Default values: ``light red/default``
 
 .. confval:: clr_note_title_week_fg
 
 .. confval:: clr_note_title_week_bg
 
+   The foreground/background colors for notes edited within the past
+   week,
+
+   Default values: ``light green/default``
+
 .. confval:: clr_note_title_month_fg
 
 .. confval:: clr_note_title_month_bg
+
+   The foreground/background colors for notes edited within the past
+   month.
+
+   Default values: ``brown/default``
 
 .. confval:: clr_note_title_year_fg
 
 .. confval:: clr_note_title_year_bg
 
+   The foreground/background colors for notes edited within the past
+   year.
+
+   Default values: ``light blue/default``
+
 .. confval:: clr_note_title_ancient_fg
 
 .. confval:: clr_note_title_ancient_bg
+
+   The foreground/background colors for notes last edited more than one
+   year ago.
+
+   Default values: ``light blue/default``
 
 .. confval:: clr_note_date_fg
 
 .. confval:: clr_note_date_bg
 
+   The foreground/background colors for the note date (i.e. the ``%D``
+   portion of :confval:`cfg_format_note_title`).
+
+   Default values: ``dark blue/default``
+
 .. confval:: clr_note_flags_fg
 
 .. confval:: clr_note_flags_bg
+
+   The foreground/background colors for the note flags (i.e., the ``%F``
+   portion of :confval:`cfg_format_note_title`).
+
+   Default values: ``dark magenta/default``
 
 .. confval:: clr_note_category_fg
 
 .. confval:: clr_note_category_bg
 
+   The foreground/background colors for the note category (i.e., the
+   ``%T`` portion of :confval:`cfg_format_note_title`).
+
+   Default values: ``dark red/default``
+
 .. confval:: clr_note_content_fg
 
 .. confval:: clr_note_content_bg
+
+   The foreground/background colors for the note content as displayed
+   in the internal pager.
+
+   Default values: ``default/default``
 
 .. confval:: clr_note_content_focus_fg
 
 .. confval:: clr_note_content_focus_bg
 
+   The foreground/background colors for focused content within the
+   internal pager.
+
+   Default values: ``white/light red``
+
 .. confval:: clr_note_content_old_fg
 
 .. confval:: clr_note_content_old_bg
+
+   The foreground/background colors for old note content as displayed
+   within the internal pager.
+
+   Default values: ``yellow/dark gray``
 
 .. confval:: clr_note_content_old_focus_fg
 
 .. confval:: clr_note_content_old_focus_bg
 
+   The foreground/background colors for old note focused content as
+   displayed within the internal pager.
+
+   Default values: ``white/light red``
+
 .. confval:: clr_help_focus_fg
 
 .. confval:: clr_help_focus_bg
+
+   The foreground/background colors for focused content in the help
+   screen.
+
+   Default values: ``white/light red``
 
 .. confval:: clr_help_header_fg
 
 .. confval:: clr_help_header_bg
 
+   The foreground/background colors for header content in the help
+   screen.
+
+   Default values: ``dark blue/default``
+
 .. confval:: clr_help_config_fg
 
 .. confval:: clr_help_config_bg
+
+   The foreground/background colors for configuration option name (e.g.,
+   ``clr_help_focus_bg``) in the help screen.
+
+   Default values: ``dark green/default``
 
 .. confval:: clr_help_value_fg
 
 .. confval:: clr_help_value_bg
 
+   The foreground/background colors for the value of a configuration
+   option as set in ``config``.
+
+   Default values: ``dark red/default``
+
 .. confval:: clr_help_descr_fg
 
 .. confval:: clr_help_descr_bg
+
+   The foreground/background colors for the configuration options
+   description in the help screen.
+
+   Default values: ``default/default``
 
 Examples
 --------
@@ -588,18 +722,3 @@ See example configuration file below for more notes.
 
    ; this is also supported for the pager:
    cfg_pager = less -c +{line} -N {fname}
-
-.. index:: single: configuration; gui colors
-
-Colors
-------
-
-nncli utilizes the Python Urwid_ module to implement the console user
-interface.
-
-At this time, nncli does not yet support 256-color terminals and is
-limited to just 16-colors. Color names that can be specified in the
-``config`` file are listed here_.
-
-.. _Urwid: http://urwid.org
-.. _here: http://urwid.org/manual/displayattributes.html#standard-foreground-colors
