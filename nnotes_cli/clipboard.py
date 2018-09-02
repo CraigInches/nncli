@@ -1,6 +1,7 @@
+# -*- encoding: utf-8 -*-
+
 import os
 from distutils import spawn
-
 
 class Clipboard(object):
     def __init__(self):

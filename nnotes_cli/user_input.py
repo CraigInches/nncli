@@ -1,6 +1,4 @@
-
-# Copyright (c) 2014 Eric Davis
-# Licensed under the MIT License
+# -*- encoding: utf-8 -*-
 
 import urwid
 

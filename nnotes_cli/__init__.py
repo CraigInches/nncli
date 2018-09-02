@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 try:
     from . import version
     __version__ = version.version
