@@ -24,7 +24,7 @@
 import os
 import sys
 
-from nnotes_cli.config import Config
+from nncli.config import Config
 from pytest import raises
 
 def test_init():

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "nncli"
+author = "Daniel Moch"
+author-email = "daniel@danielmoch.com"
+home-page = "https://github.com/djmoch/nncli"
+description-file = "README.rst"
+requires = ["urwid", "requests", "appdirs"]
+classifiers = ["License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Environment :: Console :: Curses",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only"]
+requires-python = ">=3"
+
+[tool.flit.metadata.requires-extra]
+dev = ["pipenv"]
+
+[tool.flit.scripts]
+nncli = "nncli.nncli:main"

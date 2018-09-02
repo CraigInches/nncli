@@ -15,7 +15,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.sep.join(['..', '..'])))
-import nnotes_cli
+import nncli
 
 # -- Project information -----------------------------------------------------
 
@@ -24,9 +24,9 @@ copyright = '2018, Daniel Moch'
 author = 'Daniel Moch'
 
 # The short X.Y version
-version = nnotes_cli.__version__
+version = nncli.__version__
 # The full version, including alpha/beta/rc tags
-release = nnotes_cli.__version__
+release = nncli.__version__
 
 
 # -- General configuration ---------------------------------------------------

@@ -1,7 +1,0 @@
-#!/usr/bin/env python3
-# -*- encoding: utf-8 -*-
-
-from nnotes_cli import nncli
-
-if __name__ == '__main__':
-    nncli.main()

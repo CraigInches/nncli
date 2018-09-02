@@ -45,4 +45,3 @@ class ViewLog(urwid.ListBox):
 
     def keypress(self, size, key):
         return key
-

@@ -646,4 +646,3 @@ class NotesDB():
         self.go_cond.acquire()
         self.go_cond.notify()
         self.go_cond.release()
-

@@ -2,7 +2,7 @@ build/
 dist/
 MANIFEST
 *.egg-info/
-nnotes_cli/version.py
 .coverage
 .pytest_cache/
 docs/build/
+.tox

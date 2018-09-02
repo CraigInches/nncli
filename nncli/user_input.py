@@ -21,4 +21,3 @@ class UserInput(urwid.Edit):
         else:
             return super(UserInput, self).keypress(size, key)
         return None
-

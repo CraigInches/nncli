@@ -271,4 +271,3 @@ class Config:
 
     def get_color_descr(self, name):
         return self.colors[name][1]
-

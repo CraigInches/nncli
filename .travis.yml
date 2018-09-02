@@ -1,0 +1,44 @@
+# https://travis-ci.org/djmoch/hookmeup
+language: python
+
+matrix:
+  fast_finish: true
+
+.mixins:
+- &xenial-mixin
+  dist: xenial
+  sudo: true
+  addons:
+    apt:
+      packages:
+        - libgnutls-dev
+
+env:
+  - PIPENV_HIDE_EMOJIS=1 PIPENV_NO_INHERIT=1
+
+install:
+  - pip install pipenv python-coveralls
+  - make test-install
+
+jobs:
+  include:
+    - stage: test
+      script: make test
+      python: 3.4
+    - stage: test
+      script: make test
+      python: 3.5
+    - stage: test
+      script: make test
+      python: 3.6
+    - stage: test
+      script: make test
+      <<: *xenial-mixin
+      python: 3.7
+    - stage: lint
+      script: make lint
+      python: 3.6
+    - stage: coverage
+      script: make coverage
+      after_success: coveralls
+      python: 3.5

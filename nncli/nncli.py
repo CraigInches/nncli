@@ -3,7 +3,7 @@
 import os, sys, getopt, re, signal, time, datetime, shlex, hashlib
 import subprocess, threading, logging
 import copy, json, urwid, datetime
-import nnotes_cli
+import nncli
 from . import view_titles, view_note, view_help, view_log, user_input
 from . import utils, temp
 from .config import Config
@@ -1148,17 +1148,7 @@ Usage:
     sys.exit(0)
 
 def version():
-    version_info = ''
-    version_info += nnotes_cli.__productname__ + ' v' + \
-            nnotes_cli.__version__ + "\n"
-    version_info += nnotes_cli.__description__ + "\n\n"
-    version_info += nnotes_cli.__copyright__ + "\n"
-    version_info += "Written by " + nnotes_cli.__author__ + \
-            " and others\n"
-    version_info += "Licensed under the terms of the " + \
-            nnotes_cli.__license__ + " license\n"
-    version_info += "The latest code is available at: " + \
-            nnotes_cli.__url__
+    version_info = 'nncli {}'.format(nncli.__version__)
     print(version_info)
     exit(0)
 
@@ -1313,4 +1303,3 @@ def main(argv=sys.argv[1:]):
 
     else:
         usage()
-

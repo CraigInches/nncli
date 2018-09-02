@@ -56,29 +56,29 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .tox
 
 lint: ## check style with pylint
-	$(PIPRUN) pylint nnotes_cli tests --disable=parse-error
+	$(PIPRUN) pylint nncli tests --disable=parse-error
 
 test: ## run tests quickly with the default Python
 	$(PIPRUN) python -m pytest
 
-# test-all: ## run tests on every Python version with tox
-# 	$(PIPRUN) tox
+test-all: ## run tests on every Python version with tox
+	$(PIPRUN) tox
 
-# test-install: ## install dependenices from Pipfile (for tox / CI builds)
-# 	$(PIPINST)
+test-install: ## install dependenices from Pipfile (for tox / CI builds)
+	$(PIPINST)
 
 coverage: ## check code coverage quickly with the default Python
-	$(PIPRUN) python -m pytest --cov=nnotes_cli
+	$(PIPRUN) python -m pytest --cov=nncli
 
 coverage-html: coverage ## generate an HTML report and open in browser
 	$(PIPRUN) coverage html
 	$(BROWSER) htmlcov/index.html
 
-# release: dist ## package and upload a release
-# 	$(PIPRUN) flit publish
+release: dist ## package and upload a release
+	$(PIPRUN) flit publish
 
 dist: ## builds source and wheel package
-	$(PIPRUN) python setup.py build sdist bdist_wheel
+	$(PIPRUN) flit build
 	ls -l dist
 
 docs: ## builds the sphinx documentation and opens in the browser
@@ -86,10 +86,10 @@ docs: ## builds the sphinx documentation and opens in the browser
 	$(BROWSER) docs/build/html/index.html
 
 install: ## install the package to the active Python's site-packages
-	$(PIPRUN) python setup.py install --deps=none
+	$(PIPRUN) flit install --deps=none
 
 run: ## run the package from site-packages
-	$(PIPRUN) python -m nnotes_cli $(cmd)
+	$(PIPRUN) python -m nncli $(cmd)
 
 debug: install ## debug the package from site packages
 	$(PIPRUN) pudb3 $$($(PIPRUN) which nncli) $(cmd)
