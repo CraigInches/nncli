@@ -27,7 +27,7 @@ export PRINT_HELP_PYSCRIPT
 BROWSER := python -c "$$BROWSER_PYSCRIPT"
 PIPENV := pipenv
 PIPRUN := $(PIPENV) run
-PIPINST := $(PIPENV) --bare install --dev --skip-lock
+PIPINST := $(PIPENV) --bare install --dev
 
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)

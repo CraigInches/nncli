@@ -17,7 +17,7 @@ env:
   - PIPENV_HIDE_EMOJIS=1 PIPENV_NO_INHERIT=1
 
 install:
-  - pip install pipenv python-coveralls
+  - pip install -U pip pipenv python-coveralls
   - make test-install
 
 jobs:
