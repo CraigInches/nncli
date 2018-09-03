@@ -1,18 +1,3 @@
-.. image:: https://img.shields.io/pypi/l/nncli.svg
-   :alt: PyPI - License
-.. image:: https://img.shields.io/travis/com/djmoch/nncli.svg
-   :alt: Travis (.com)
-   :target: https://travis-ci.com/djmoch/nncli
-.. image:: https://img.shields.io/pypi/v/nncli.svg
-   :alt: PyPI
-   :target: https://pypi.org/project/nncli
-.. image:: https://img.shields.io/coveralls/github/djmoch/nncli.svg
-   :alt: Coveralls github
-   :target: https://coveralls.io/github/djmoch/nncli
-.. image:: https://img.shields.io/readthedocs/nncli.svg
-   :alt: Read the Docs
-   :target: https://nncli.readthedocs.io
-
 nncli is a Python application that gives you access to your NextCloud
 Notes account via the command line. It's a "hard" fork of
 sncli_. You can access your notes via
