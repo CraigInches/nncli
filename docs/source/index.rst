@@ -25,16 +25,18 @@ NextCloud Notes Command Line Interface
 
 .. include:: ../../README.rst
 
+Contents
+--------
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    configuration
    usage
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`search`

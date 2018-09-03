@@ -11,7 +11,7 @@ automatically sync'ed when nncli is brought online.
 More detailed documentation can be found in the docs.
 
 Requirements
-~~~~~~~~~~~~
+------------
 
 - `Python 3`_
 
@@ -22,7 +22,7 @@ Requirements
 - A love for the command line!
 
 Installation
-~~~~~~~~~~~~
+------------
 
 - Via pip (latest release):
 
@@ -44,7 +44,7 @@ Installation
   - Stand up development environment: ``pipenv install --dev``
 
 Features
-~~~~~~~~
+--------
 
 - Console GUI
 
@@ -103,7 +103,7 @@ Features
   - view and edit note category
 
 Acknowledgements
-~~~~~~~~~~~~~~~~
+----------------
 
 nncli is a fork of sncli_ by Eric Davis. This application further pulls in
 and uses modified versions of the simplenote.py_ module by Daniel Schauenberg and

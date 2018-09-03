@@ -83,6 +83,7 @@ dist: ## builds source and wheel package
 
 docs: ## builds the sphinx documentation and opens in the browser
 	make -C docs html
+	make -C docs latexpdf
 	$(BROWSER) docs/build/html/index.html
 
 install: ## install the package to the active Python's site-packages
