@@ -196,7 +196,8 @@ Keybindings
 
 Keybindings specify the behavior of the console GUI, and are never
 required in the ``config`` file. However, they all have default values,
-as outlined below.
+as outlined below. More information on specifying keybindings can be
+found in the :ref:`Urwid documentation <urwid:keyboard-input>`.
 
 .. confval:: kb_help
 
