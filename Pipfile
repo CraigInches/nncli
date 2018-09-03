@@ -20,3 +20,4 @@ flit = "*"
 setuptools = "*"
 mock = "*"
 tox = "*"
+pathlib2 = {version = "*", markers = "python_version < '3.5'"}
