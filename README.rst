@@ -30,18 +30,20 @@ Installation
 
 - Manually:
 
+  - If you don't already have it, install Flit_: ``pip3 install flit``
+
   - Clone this repository to your hard disk: ``git clone
     https://github.com/djmoch/nncli.git``
 
-  - Install nncli: ``python3 setup.py install``
+  - Install nncli: ``flit install --deps production``
 
 - Development:
 
   - Clone the repo
 
-  - Install Pipenv: ``pip install pipenv``
+  - Install Pipenv: ``pip3 install pipenv``
 
-  - Stand up development environment: ``pipenv install --dev``
+  - Stand up development virtualenv: ``pipenv install --dev``
 
 Features
 --------
@@ -115,3 +117,4 @@ the notes_db.py module from nvpy_ by Charl P. Botha.
 .. _Requests: https://requests.readthedocs.org/en/master
 .. _simplenote.py: https://github.com/mrtazz/simplenote.py
 .. _nvpy: https://github.com/cpbotha/nvpy
+.. _Flit: https://flit.readthedocs.io
