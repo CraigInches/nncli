@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import os, sys, getopt, re, signal, time, datetime, shlex, hashlib
 import subprocess, threading, logging
