@@ -3,9 +3,8 @@
 import os, sys, getopt, re, signal, time, datetime, shlex, hashlib
 import subprocess, threading, logging
 import copy, json, urwid, datetime
-import nncli
 from . import view_titles, view_note, view_help, view_log, user_input
-from . import utils, temp
+from . import utils, temp, __version__
 from .config import Config
 from .nextcloud_note import NextcloudNote
 from .notes_db import NotesDB, ReadError, WriteError
@@ -1152,7 +1151,7 @@ Usage:
     sys.exit(0)
 
 def version():
-    version_info = 'nncli {}'.format(nncli.__version__)
+    version_info = 'nncli {}'.format(__version__)
     print(version_info)
     exit(0)
 
