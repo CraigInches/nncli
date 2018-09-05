@@ -53,34 +53,6 @@ def get_note_title_file(note):
     else:
         return ''
 
-def human_date(timestamp):
-    """
-    Given a timestamp, return pretty human format representation.
-
-    For example, if timestamp is:
-    * today, then do "15:11"
-    * else if it is this year, then do "Aug 4"
-    * else do "Dec 11, 2011"
-    """
-
-    # this will also give us timestamp in the local timezone
-    dt = datetime.datetime.fromtimestamp(timestamp)
-    # this returns localtime
-    now = datetime.datetime.now()
-
-    if dt.date() == now.date():
-        # today: 15:11
-        return dt.strftime('%H:%M')
-
-    elif dt.year == now.year:
-        # this year: Aug 6
-        # format code %d unfortunately 0-pads
-        return dt.strftime('%b') + ' ' + str(dt.day)
-
-    else:
-        # not today or this year, so we do "Dec 11, 2011"
-        return '%s %d, %d' % (dt.strftime('%b'), dt.day, dt.year)
-
 def note_favorite(n):
     if 'favorite' in n:
         return n['favorite']
