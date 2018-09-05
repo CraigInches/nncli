@@ -68,7 +68,7 @@ General Options
 
    - macOS: ``~/Library/Caches/nncli``
 
-   - \*nix: ``~/.cache/nncli``
+   - \*nix: ``$XDG_CACHE_HOME/nncli`` or ``$HOME/.config/nncli``
 
 .. confval:: cfg_search_categories
 
