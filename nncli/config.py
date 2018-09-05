@@ -25,7 +25,6 @@ class Config:
          'cfg_status_bar'        : 'yes',
          'cfg_editor'            : os.environ['EDITOR'] if 'EDITOR' in os.environ else 'vim {fname} +{line}',
          'cfg_pager'             : os.environ['PAGER'] if 'PAGER' in os.environ else 'less -c',
-         'cfg_diff'              : 'diff -b -U10',
          'cfg_max_logs'          : '5',
          'cfg_log_timeout'       : '5',
          'cfg_log_reversed'      : 'yes',
@@ -159,7 +158,6 @@ class Config:
         self.configs['status_bar'] = [ cp.get(cfg_sec, 'cfg_status_bar'), 'Show the status bar' ]
         self.configs['editor'] = [ cp.get(cfg_sec, 'cfg_editor'), 'Editor command' ]
         self.configs['pager'] = [ cp.get(cfg_sec, 'cfg_pager'), 'External pager command' ]
-        self.configs['diff'] = [ cp.get(cfg_sec, 'cfg_diff'), 'External diff command' ]
         self.configs['max_logs'] = [ cp.get(cfg_sec, 'cfg_max_logs'), 'Max logs in footer' ]
         self.configs['log_timeout'] = [ cp.get(cfg_sec, 'cfg_log_timeout'), 'Log timeout' ]
         self.configs['log_reversed'] = [ cp.get(cfg_sec, 'cfg_log_reversed'), 'Log file reversed' ]

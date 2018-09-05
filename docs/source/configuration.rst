@@ -154,10 +154,6 @@ General Options
    Optional. Default value: ``$PAGER`` if defined in the user's
    environment, else ``less -c``.
 
-.. confval:: cfg_diff
-
-   .. todo:: Remove ``cfg_diff``
-
 .. confval:: cfg_max_logs
 
    Sets the number of log events to display together in the consule GUI
