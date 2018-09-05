@@ -131,6 +131,10 @@ class nncli:
                 content = None
 
         temp.tempfile_delete(tf)
+
+        self.nncli_loop.screen.clear()
+        self.nncli_loop.draw_screen()
+
         return content
 
     def exec_diff_on_note(self, note, old_note):
