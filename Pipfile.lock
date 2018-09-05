@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b07b723ca884ef9549d72eeabbfe0302e000bc84b4e3c6fece2b8a7ce351703c"
+            "sha256": "a99ad6723213e0eb2b128bc8cc247fcf543fe0881dcf614f7c942e0572ae0723"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -463,6 +463,14 @@
             ],
             "markers": "python_version != '3.2.*' and python_version >= '2.7' and python_version != '3.0.*' and python_version != '3.1.*'",
             "version": "==16.0.0"
+        },
+        "vulture": {
+            "hashes": [
+                "sha256:79c89ef5e3f2365467bcf491f425f777ae8fd157584dcc550d4591920b00fe3f",
+                "sha256:e794345a19c76f93f48f4519653038df90ad468ddea7912e14b07a07f6412e32"
+            ],
+            "index": "pypi",
+            "version": "==0.29"
         },
         "wrapt": {
             "hashes": [

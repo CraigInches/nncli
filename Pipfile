@@ -21,3 +21,4 @@ mock = "*"
 tox = "*"
 pathlib2 = {version = "*", markers = "python_version < '3.5'"}
 scandir = {version = "*", markers = "python_version < '3.5'"}
+vulture = "*"
