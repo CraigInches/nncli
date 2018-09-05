@@ -57,6 +57,7 @@ clean-test: ## remove test and coverage artifacts
 
 lint: ## check style with pylint
 	$(PIPRUN) pylint nncli tests --disable=parse-error
+	$(PIPRUN) vulture nncli .vulture_whitelist
 
 test: ## run tests quickly with the default Python
 	$(PIPRUN) python -m pytest

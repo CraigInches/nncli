@@ -2,8 +2,6 @@
 
 import os, time, re, glob, json, copy, threading
 from . import utils
-from . import nextcloud_note
-nextcloud_note.NOTE_FETCH_LENGTH=100
 from .nextcloud_note import NextcloudNote
 import logging
 
@@ -63,11 +61,6 @@ class NotesDB():
         self.note = NextcloudNote(self.config.get_config('nn_username'),
                                   self.config.get_config('nn_password'),
                                   self.config.get_config('nn_host'))
-
-        # we'll use this to store which notes are currently being synced by
-        # the background thread, so we don't add them anew if they're still
-        # in progress. This variable is only used by the background thread.
-        self.threaded_syncing_keys = {}
 
     def filtered_notes_sort(self, filtered_notes, sort_mode='date'):
         if sort_mode == 'date':
@@ -321,14 +314,8 @@ class NotesDB():
     def get_note(self, key):
         return self.notes[key]
 
-    def get_note_favorite(self, key):
-        return self.notes[key].get('favorite')
-
     def get_note_category(self, key):
         return self.notes[key].get('category')
-
-    def get_note_content(self, key):
-        return self.notes[key].get('content')
 
     def flag_what_changed(self, note, what_changed):
         if 'what_changed' not in note:
@@ -520,7 +507,6 @@ class NotesDB():
         #           a new note and key is not in local store
         #            retrieve note, update note with response
         if not skip_remote_syncing:
-            len_nl = len(nl)
             for note_index, n in enumerate(nl):
                 k = n.get('id')
                 c = n.get('category') if n.get('category') is not None \
@@ -602,16 +588,9 @@ class NotesDB():
         o = utils.KeyValueObject(saved=False, synced=False, modified=False)
         modified = float(n['modified'])
         savedate   = float(n['savedate'])
-        syncdate   = float(n['syncdate'])
 
         if savedate > modified:
             o.saved = True
-        else:
-            o.modified = True
-
-        if syncdate > modified:
-            o.synced = True
-
         return o
 
     def verify_all_saved(self):

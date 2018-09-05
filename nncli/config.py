@@ -118,9 +118,9 @@ class Config:
 
         cp = configparser.SafeConfigParser(defaults)
         if custom_file is not None:
-            self.configs_read = cp.read([custom_file])
+            cp.read([custom_file])
         else:
-            self.configs_read = cp.read([os.path.join(self.config_home, 'config')])
+            cp.read([os.path.join(self.config_home, 'config')])
 
         cfg_sec = 'nncli'
 

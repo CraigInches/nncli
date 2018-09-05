@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import urllib.parse
 from requests.exceptions import RequestException, ConnectionError
-import base64
 import time
 import datetime
 import logging
@@ -17,11 +15,6 @@ except ImportError:
     except ImportError:
         # For Google AppEngine
         from django.utils import simplejson as json
-
-NOTE_FETCH_LENGTH = 100
-
-class NextcloudLoginFailed(Exception):
-    pass
 
 class NextcloudNote(object):
     """ Class for interacting with the NextCloud Notes web service """
@@ -126,31 +119,6 @@ class NextcloudNote(object):
             return e, -1
         #logging.debug('RESPONSE OK: ' + str(note))
         return note, 0
-
-    def add_note(self, note):
-        """wrapper function to add a note
-
-        The function can be passed the note as a dict with the `content`
-        property set, which is then directly send to the web service for
-        creation. Alternatively, only the body as string can also be passed. In
-        this case the parameter is used as `content` for the new note.
-
-        Arguments:
-            - note (dict or string): the note to add
-
-        Returns:
-            A tuple `(note, status)`
-
-            - note (dict): the newly created note
-            - status (int): 0 on sucesss and -1 otherwise
-
-        """
-        if type(note) == str:
-            return self.update_note({"content": note})
-        elif (type(note) == dict) and "content" in note:
-            return self.update_note(note)
-        else:
-            return "No string or valid note.", -1
 
     def get_note_list(self, category=None):
         """ function to get the note list

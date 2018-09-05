@@ -34,25 +34,6 @@ def get_note_title(note):
     else:
         return ''
 
-def get_note_title_file(note):
-    mo = note_title_re.match(note.get('content', ''))
-    if mo:
-        fn = mo.groups()[0]
-        fn = fn.replace(' ', '_')
-        fn = fn.replace('/', '_')
-        if not fn:
-            return ''
-
-        if isinstance(fn, str):
-            fn = str(fn, 'utf-8')
-        else:
-            fn = str(fn)
-
-        fn += '.mkdn'
-        return fn
-    else:
-        return ''
-
 def note_favorite(n):
     if 'favorite' in n:
         return n['favorite']

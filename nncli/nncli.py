@@ -75,13 +75,6 @@ class nncli:
             return None
         return pager
 
-    def get_diff(self):
-        diff = self.config.get_config('diff')
-        if not diff:
-            self.log('No diff command configured!')
-            return None
-        return diff
-
     def exec_cmd_on_note(self, note, cmd=None, raw=False):
 
         if not cmd:
@@ -136,41 +129,6 @@ class nncli:
 
         return content
 
-    def exec_diff_on_note(self, note, old_note):
-
-        diff = self.get_diff()
-        if not diff:
-            return None
-
-        pager = self.get_pager()
-        if not pager:
-            return None
-
-        ltf = temp.tempfile_create(note, tempdir=self.tempdir)
-        otf = temp.tempfile_create(old_note, tempdir=self.tempdir)
-        out = temp.tempfile_create(None, tempdir=self.tempdir)
-
-        try:
-            subprocess.call(diff + ' ' +
-                            temp.tempfile_name(ltf) + ' ' +
-                            temp.tempfile_name(otf) + ' > ' +
-                            temp.tempfile_name(out),
-                            shell=True)
-            subprocess.check_call(pager + ' ' +
-                                  temp.tempfile_name(out),
-                                  shell=True)
-        except Exception as e:
-            self.log('Command error: ' + str(e))
-            temp.tempfile_delete(ltf)
-            temp.tempfile_delete(otf)
-            temp.tempfile_delete(out)
-            return None
-
-        temp.tempfile_delete(ltf)
-        temp.tempfile_delete(otf)
-        temp.tempfile_delete(out)
-        return None
-
     def gui_header_clear(self):
         self.master_frame.contents['header'] = ( None, None )
         self.nncli_loop.draw_screen()
@@ -178,12 +136,6 @@ class nncli:
     def gui_header_set(self, w):
         self.master_frame.contents['header'] = ( w, None )
         self.nncli_loop.draw_screen()
-
-    def gui_header_get(self):
-        return self.master_frame.contents['header'][0]
-
-    def gui_header_focus(self):
-        self.master_frame.focus_position = 'header'
 
     def gui_footer_log_clear(self):
         ui = self.gui_footer_input_get()
@@ -218,10 +170,6 @@ class nncli:
     def gui_footer_focus_input(self):
         self.master_frame.focus_position = 'footer'
         self.master_frame.contents['footer'][0].focus_position = 1
-
-    def gui_body_clear(self):
-        self.master_frame.contents['body'] = ( None, None )
-        self.nncli_loop.draw_screen()
 
     def gui_body_set(self, w):
         self.master_frame.contents['body'] = ( w, None )
