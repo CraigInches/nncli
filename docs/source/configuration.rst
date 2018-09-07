@@ -5,8 +5,7 @@ Configuration
 
 The current NextCloud Notes API does not support oauth authentication so
 your NextCloud Notes account password must be stored someplace
-accessible to nncli. Use of the ``cfg_nn_password_eval`` option is
-recommended (see :ref:`config-file`).
+accessible to nncli.
 
 .. index:: single: configuration file
 
@@ -16,7 +15,7 @@ Configuration File
 ------------------
 
 nncli pulls in configuration from the ``config`` file located in the
-standard location for your platform.
+standard location for your platform:
 
 - Windows: ``%USERPROFILE%\AppData\Local\djmoch\nncli``
 
@@ -50,6 +49,11 @@ General Options
 
    Optional. Overrides :confval:`cfg_nn_password_eval` if both are
    specified.
+
+   .. note::
+
+      For security reasons, use of the ``cfg_nn_password_eval`` option
+      is recommended
 
 .. confval:: cfg_nn_password_eval
 
@@ -453,9 +457,12 @@ Colors
 nncli utilizes the Python Urwid_ module to implement the console user
 interface.
 
-At this time, nncli does not yet support 256-color terminals and is
-limited to just 16-colors. Color names that can be specified in the
-``config`` file are listed :ref:`here <urwid:16-standard-foreground>`.
+.. note::
+
+   At this time, nncli does not yet support 256-color terminals and is
+   limited to just 16-colors. Color names that can be specified in the
+   ``config`` file are listed :ref:`here
+   <urwid:16-standard-foreground>`.
 
 The following pairs of configuration values represent the foreground and
 background colors for different elements of the console GUI. In each
