@@ -30,14 +30,14 @@ def assert_initialized():
 
 def test_init_no_tempdir(mocker, mock_nncli):
     mock_get_config(mocker, ['what', '', 'duh', 'duh', 'duh'])
-    nn = nncli.nncli.nncli(False)
+    nn = nncli.nncli.Nncli(False)
     assert_initialized()
     assert nn.tempdir == None
     os.mkdir.assert_called_with('duh')
 
 def test_init(mocker, mock_nncli):
     mock_get_config(mocker, ['what', 'blah', 'duh', 'duh', 'duh'])
-    nn = nncli.nncli.nncli(False)
+    nn = nncli.nncli.Nncli(False)
     assert_initialized()
     assert nn.tempdir == 'blah'
 
@@ -47,25 +47,25 @@ def test_init_notesdb_fail(mocker, mock_nncli):
             new=mocker.MagicMock(side_effect=SystemExit)
             )
     with pytest.raises(SystemExit):
-        nn = nncli.nncli.nncli(False)
+        nn = nncli.nncli.Nncli(False)
 
 def test_get_editor(mocker, mock_nncli):
     mock_get_config(mocker, ['what', 'blah', 'duh', 'duh', 'duh', 'vim', ''])
-    nn = nncli.nncli.nncli(False)
+    nn = nncli.nncli.Nncli(False)
     assert_initialized()
     assert nn.get_editor() == 'vim'
     assert nn.get_editor() == None
 
 def test_get_pager(mocker, mock_nncli):
     mock_get_config(mocker, ['what', 'blah', 'duh', 'duh', 'duh', 'less', ''])
-    nn = nncli.nncli.nncli(False)
+    nn = nncli.nncli.Nncli(False)
     assert_initialized()
     assert nn.get_editor() == 'less'
     assert nn.get_editor() == None
 
 def test_get_diff(mocker, mock_nncli):
     mock_get_config(mocker, ['what', 'blah', 'duh', 'duh', 'duh', 'diff', ''])
-    nn = nncli.nncli.nncli(False)
+    nn = nncli.nncli.Nncli(False)
     assert_initialized()
     assert nn.get_editor() == 'diff'
     assert nn.get_editor() == None
@@ -73,7 +73,7 @@ def test_get_diff(mocker, mock_nncli):
 @pytest.mark.skip
 def test_exec_cmd_on_note(mocker, mock_nncli):
     mocker.patch.object(
-            'nncli.nncli.nncli',
+            'nncli.nncli.Nncli',
             get_editor,
             new=mocker.MagicMock(return_value='vim'))
     mocker.patch('nncli.temp.tempfile_create')

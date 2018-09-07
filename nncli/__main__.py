@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """nncli main module"""
-import nncli.nncli
+import nncli.cli
 
 if __name__ == '__main__':
-    nncli.nncli.main()
+    nncli.cli.main()

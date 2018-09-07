@@ -10,7 +10,7 @@ from .nextcloud_note import NextcloudNote
 from .notes_db import NotesDB, ReadError, WriteError
 from logging.handlers import RotatingFileHandler
 
-class nncli:
+class Nncli:
 
     def __init__(self, do_server_sync, verbose=False, config_file=None):
         self.config         = Config(config_file)
@@ -124,8 +124,9 @@ class nncli:
 
         temp.tempfile_delete(tf)
 
-        self.nncli_loop.screen.clear()
-        self.nncli_loop.draw_screen()
+        if self.do_gui:
+            self.nncli_loop.screen.clear()
+            self.nncli_loop.draw_screen()
 
         return content
 
@@ -1059,198 +1060,3 @@ def SIGINT_handler(signum, frame):
     sys.exit(1)
 
 signal.signal(signal.SIGINT, SIGINT_handler)
-
-def usage():
-    print ('''
-Usage:
- nncli [OPTIONS] [COMMAND] [COMMAND_ARGS]
-
- OPTIONS:
-  -h, --help                  - usage help
-  -v, --verbose               - verbose output
-  -n, --nosync                - don't perform a server sync
-  -r, --regex                 - search string is a regular expression
-  -k <key>, --key=<key>       - note key
-  -t <title>, --title=<title> - title of note for create (cli mode)
-  -c <file>, --config=<file>  - config file to read from
-  -V, --version               - version information
-
- COMMANDS:
-  <none>                      - console gui mode when no command specified
-  sync                        - perform a full sync with the server
-  list [search_string]        - list notes (refined with search string)
-  export [search_string]      - export notes in JSON (refined with search
-                                string)
-  dump [search_string]        - dump notes (refined with search string)
-  create [-]                  - create a note ('-' content from stdin)
-  import [-]                  - import a note in JSON format ('-' JSON from
-                                stdin)
-  export                      - export a note in JSON format (specified by
-                                <key>)
-  dump                        - dump a note (specified by <key>)
-  edit                        - edit a note (specified by <key>)
-  delete                      - delete a note (specified by <key>)
-  < favorite | unfavorite >   - favorite/unfavorite a note (specified by <key>)
-  cat get                     - retrieve the category from a note (specified
-                                by <key>)
-  cat set <category>          - set the category for a note (specified by <key>)
-  cat rm                      - remove category from a note (specified by <key>)
-''')
-    sys.exit(0)
-
-def version():
-    version_info = 'nncli {}'.format(__version__)
-    print(version_info)
-    exit(0)
-
-def main(argv=sys.argv[1:]):
-    verbose = False
-    sync    = True
-    regex   = False
-    key     = None
-    title   = None
-    config  = None
-
-    try:
-        opts, args = getopt.getopt(argv,
-            'hvnrk:t:c:V',
-            [ 'help', 'verbose', 'nosync', 'regex', 'key=', 'title=', \
-                'config=', 'version' ])
-    except:
-        usage()
-
-    for opt, arg in opts:
-        if opt in [ '-h', '--help']:
-            usage()
-        elif opt in ['-V', '--version' ]:
-            version()
-        elif opt in [ '-v', '--verbose']:
-            verbose = True
-        elif opt in [ '-n', '--nosync']:
-            sync = False
-        elif opt in [ '-r', '--regex']:
-            regex = True
-        elif opt in [ '-k', '--key']:
-            try:
-                key = int(arg)
-            except:
-                print('ERROR: Key specified with -k must be an integer')
-        elif opt in [ '-t', '--title']:
-            title = arg
-        elif opt in [ '-c', '--config']:
-            config = arg
-        else:
-            print('ERROR: Unhandled option')
-            usage()
-
-    if not args:
-        nncli(sync, verbose, config).gui(key)
-        return
-
-    def nncli_start(sync=sync, verbose=verbose, config=config):
-        sn = nncli(sync, verbose, config)
-        if sync: sn.sync_notes()
-        return sn
-
-    if args[0] == 'sync':
-        sn = nncli_start(True)
-
-    elif args[0] == 'list':
-
-        sn = nncli_start()
-        sn.cli_list_notes(regex, ' '.join(args[1:]))
-
-    elif args[0] == 'dump':
-
-        sn = nncli_start()
-        if key:
-            sn.cli_note_dump(key)
-        else:
-            sn.cli_dump_notes(regex, ' '.join(args[1:]))
-
-    elif args[0] == 'create':
-
-        if len(args) == 1:
-            sn = nncli_start()
-            sn.cli_note_create(False, title)
-        elif len(args) == 2 and args[1] == '-':
-            sn = nncli_start()
-            sn.cli_note_create(True, title)
-        else:
-            usage()
-
-    elif args[0] == 'import':
-
-        if len(args) == 1:
-            sn = nncli_start()
-            sn.cli_note_import(False)
-        elif len(args) == 2 and args[1] == '-':
-            sn = nncli_start()
-            sn.cli_note_import(True)
-        else:
-            usage()
-
-    elif args[0] == 'export':
-
-        sn = nncli_start()
-        if key:
-            sn.cli_note_export(key)
-        else:
-            sn.cli_export_notes(regex, ' '.join(args[1:]))
-
-    elif args[0] == 'edit':
-
-        if not key:
-            usage()
-
-        sn = nncli_start()
-        sn.cli_note_edit(key)
-
-    elif args[0] == 'delete':
-
-        if not key:
-            usage()
-
-        sn = nncli_start()
-        sn.cli_note_delete(key, True)
-
-    elif args[0] == 'favorite' or args[0] == 'unfavorite':
-
-        if not key:
-            usage()
-
-        sn = nncli_start()
-        sn.cli_note_favorite(key, 1 if args[0] == 'favorite' else 0)
-
-    # Category API
-    elif args[0] == 'cat':
-
-        if not key:
-            usage()
-
-        nargs = len(args)
-        correct_other = (args[1] in ['get', 'rm'] and nargs == 2)
-        correct_set = (args[1] == 'set' and nargs == 3)
-        if not (correct_set or correct_other):
-            usage()
-
-        if args[1] == 'get':
-
-            sn = nncli_start()
-            category = sn.cli_note_category_get(key)
-            if category:
-                print(category)
-
-        elif args[1] == 'set':
-
-            category = args[2]
-            sn = nncli_start()
-            sn.cli_note_category_set(key, category)
-
-        elif args[1] == 'rm':
-
-            sn = nncli_start()
-            sn.cli_note_category_rm(key)
-
-    else:
-        usage()

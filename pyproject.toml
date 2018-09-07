@@ -8,7 +8,7 @@ author = "Daniel Moch"
 author-email = "daniel@danielmoch.com"
 home-page = "https://github.com/djmoch/nncli"
 description-file = "README.rst"
-requires = ["urwid", "requests", "appdirs"]
+requires = ["urwid", "requests", "appdirs", "click"]
 classifiers = ["License :: OSI Approved :: MIT License",
     "Development Status :: 4 - Beta",
     "Environment :: Console :: Curses",
@@ -24,4 +24,4 @@ Documentation = "https://nncli.readthedocs.io/en/latest"
 dev = ["pipenv"]
 
 [tool.flit.scripts]
-nncli = "nncli.nncli:main"
+nncli = "nncli.cli:main"
