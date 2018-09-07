@@ -453,9 +453,6 @@ class NotesDB():
                         del cn['favorite']
                     del cn['what_changed']
 
-                if 'favorite' in cn:
-                    cn['favorite'] = str.lower(str(cn['favorite']))
-
                 if n['deleted']:
                     uret = self.note.delete_note(cn)
                 else:
