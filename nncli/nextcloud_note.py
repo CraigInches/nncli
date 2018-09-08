@@ -1,22 +1,13 @@
 # -*- coding: utf-8 -*-
-
-from requests.exceptions import RequestException, ConnectionError
-import time
-import datetime
+"""nextcloud_note module"""
 import logging
-import requests
+import time
 import traceback
 
-try:
-    import json
-except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        # For Google AppEngine
-        from django.utils import simplejson as json
+import requests
+from requests.exceptions import RequestException
 
-class NextcloudNote(object):
+class NextcloudNote:
     """ Class for interacting with the NextCloud Notes web service """
 
     def __init__(self, username, password, host):
@@ -49,14 +40,14 @@ class NextcloudNote(object):
             res.raise_for_status()
             note = res.json()
             self.status = 'online'
-        except ConnectionError as e:
+        except ConnectionError as ex:
             self.status = 'offline, connection error'
-            return e, -1
-        except RequestException as e:
+            return ex, -1
+        except RequestException as ex:
             # logging.debug('RESPONSE ERROR: ' + str(e))
-            return e, -1
-        except ValueError as e:
-            return e, -1
+            return ex, -1
+        except ValueError as ex:
+            return ex, -1
 
         # # use UTF-8 encoding
         # note["content"] = note["content"].encode('utf-8')
@@ -96,27 +87,32 @@ class NextcloudNote(object):
 
         #logging.debug('REQUEST: ' + url + ' - ' + str(note))
         try:
-            logging.debug('NOTE: ' + str(note))
+            logging.debug('NOTE: %s', note)
             if url != self.url:
-                res = requests.put(url, auth=(self.username,
-                    self.password), json=note)
+                res = requests.put(
+                        url,
+                        auth=(self.username, self.password),
+                        json=note
+                        )
             else:
-                res = requests.post(url, auth=(self.username,
-                    self.password), json=note)
+                res = requests.post(
+                        url, auth=(self.username, self.password),
+                        json=note
+                        )
             note = res.json()
             res.raise_for_status()
-            logging.debug('NOTE (from response): ' + str(res.json()))
+            logging.debug('NOTE (from response): %s', res.json())
             self.status = 'online'
-        except ConnectionError as e:
+        except ConnectionError as ex:
             self.status = 'offline, connection error'
-            return e, -1
-        except RequestException as e:
-            logging.debug('RESPONSE ERROR: ' + str(e))
+            return ex, -1
+        except RequestException as ex:
+            logging.debug('RESPONSE ERROR: %s', ex)
             logging.debug(traceback.print_exc())
             self.status = 'error updating note, check log'
-            return e, -1
-        except ValueError as e:
-            return e, -1
+            return ex, -1
+        except ValueError as ex:
+            return ex, -1
         #logging.debug('RESPONSE OK: ' + str(note))
         return note, 0
 
@@ -149,22 +145,25 @@ class NextcloudNote(object):
 
         # perform initial HTTP request
         try:
-            logging.debug('REQUEST: ' + self.url + \
-                '?exclude=content')
-            res = requests.get(self.url, auth=(self.username, self.password), params=params)
+            logging.debug('REQUEST: %s', self.url + '?exclude=content')
+            res = requests.get(
+                    self.url,
+                    auth=(self.username, self.password),
+                    params=params
+                    )
             res.raise_for_status()
             #logging.debug('RESPONSE OK: ' + str(res))
             note_list = res.json()
             self.status = 'online'
-        except ConnectionError as e:
+        except ConnectionError:
             logging.exception('connection error')
             self.status = 'offline, connection error'
             status = -1
-        except RequestException as e:
+        except RequestException:
             # if problem with network request/response
             logging.exception('request error')
             status = -1
-        except ValueError as e:
+        except ValueError:
             # if invalid json data
             status = -1
             logging.exception('request returned bad JSON data')
@@ -194,13 +193,13 @@ class NextcloudNote(object):
         url = '{}/{}'.format(self.url, str(note['id']))
 
         try:
-            logging.debug('REQUEST DELETE: ' + url)
+            logging.debug('REQUEST DELETE: %s', url)
             res = requests.delete(url, auth=(self.username, self.password))
             res.raise_for_status()
             self.status = 'online'
-        except ConnectionError as e:
+        except ConnectionError as ex:
             self.status = 'offline, connection error'
-            return e, -1
-        except RequestException as e:
-            return e, -1
+            return ex, -1
+        except RequestException as ex:
+            return ex, -1
         return {}, 0
