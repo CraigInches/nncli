@@ -77,14 +77,14 @@ class ViewHelp(urwid.ListBox):
                                    'help_header',
                                    'help_focus'))
         for c in self.config.configs:
-            if c in [ 'sn_username', 'sn_password' ]: continue
+            if c in [ 'nn_username', 'nn_password' ]: continue
             lines.append(
                 urwid.AttrMap(urwid.AttrMap(
                     urwid.Text(
                     [
                      ('help_descr',  ('{:>' + str(self.descr_width) + '} ').format(self.config.get_config_descr(c))),
                      ('help_config', ('{:>' + str(self.config_width) + '} ').format('cfg_' + c)),
-                     ('help_value',  "'" + self.config.get_config(c) + "'")
+                     ('help_value',  "'" + str(self.config.get_config(c)) + "'")
                     ]
                     ),
                     attr_map = None,

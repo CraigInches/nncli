@@ -12,9 +12,11 @@ class WriteError(RuntimeError):
     pass
 
 class NotesDB():
-    """NotesDB will take care of the local notes database and syncing with SN.
     """
-    def __init__(self, config, log, update_view):
+    NotesDB will take care of the local notes database and syncing with
+    NextCloud Notes
+    """
+    def __init__(self, config, log, update_view=None):
         self.config      = config
         self.log         = log
         self.update_view = update_view
@@ -61,6 +63,9 @@ class NotesDB():
         self.note = NextcloudNote(self.config.get_config('nn_username'),
                                   self.config.get_config('nn_password'),
                                   self.config.get_config('nn_host'))
+
+    def set_update_view(self, update_view):
+        self.update_view = update_view
 
     def filtered_notes_sort(self, filtered_notes, sort_mode='date'):
         if sort_mode == 'date':

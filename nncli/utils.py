@@ -1,6 +1,83 @@
 # -*- coding: utf-8 -*-
 
-import datetime, random, re
+import datetime
+import random
+import re
+import shlex
+
+import subprocess
+from subprocess import CalledProcessError
+
+from . import temp
+
+def get_editor(config, logger):
+    """Get the editor"""
+    editor = config.get_config('editor')
+    if not editor:
+        logger.log('No editor configured!')
+        return None
+    return editor
+
+def get_pager(config, logger):
+    """Get the pager"""
+    pager = config.get_config('pager')
+    if not pager:
+        logger.log('No pager configured!')
+        return None
+    return pager
+
+def exec_cmd_on_note(note, config, gui, logger, cmd=None, raw=False):
+    """Execute an external command to operate on the note"""
+
+    if not cmd:
+        cmd = get_editor(config, logger)
+    if not cmd:
+        return None
+
+    tfile = temp.tempfile_create(
+            note if note else None,
+            raw=raw,
+            tempdir=config.get_config('tempdir')
+            )
+    fname = temp.tempfile_name(tfile)
+
+    if config.state.do_gui:
+        focus_position = 0
+        try:
+            focus_position = gui.gui_body_get().focus_position
+        except IndexError:
+            pass
+
+    subs = {'fname': fname, 'line': focus_position + 1}
+    cmd_list = [c.format(**subs) for c in shlex.split(cmd)]
+
+    # if the filename wasn't able to be subbed, append it
+    # this makes it fully backwards compatible with previous configs
+    if '{fname}' not in cmd:
+        cmd_list.append(fname)
+
+    logger.log("EXECUTING: {}".format(cmd_list))
+
+    try:
+        subprocess.check_call(cmd_list)
+    except CalledProcessError as ex:
+        logger.log('Command error: %s' % ex)
+        temp.tempfile_delete(tfile)
+        return None
+
+    content = None
+    if not raw:
+        content = temp.tempfile_content(tfile)
+        if not content or content == '\n':
+            content = None
+
+    temp.tempfile_delete(tfile)
+
+    if config.state.do_gui:
+        gui.nncli_loop.screen.clear()
+        gui.nncli_loop.draw_screen()
+
+    return content
 
 def generate_random_key():
     """Generate random 30 digit (15 byte) hex string.

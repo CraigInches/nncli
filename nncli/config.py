@@ -10,7 +10,16 @@ from appdirs import user_cache_dir, user_config_dir
 
 class Config:
     """A class to contain all configuration data for nncli"""
+    class State:
+        """A container class for state information"""
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
     def __init__(self, custom_file=None):
+        self.state = Config.State(do_server_sync=True,
+                                  verbose=False,
+                                  do_gui=False,
+                                  search_direction=None)
         self.config_home = user_config_dir('nncli', 'djmoch')
         self.cache_home = user_cache_dir('nncli', 'djmoch')
 
@@ -589,7 +598,8 @@ class Config:
                 [parser.get(cfg_sec, 'cfg_log_reversed'), 'Log file reversed']
         self.configs['tempdir'] = \
                 [
-                        parser.get(cfg_sec, 'cfg_tempdir'),
+                        None if parser.get(cfg_sec, 'cfg_tempdir') == '' \
+                                else parser.get(cfg_sec, 'cfg_tempdir'),
                         'Temporary directory for note storage'
                 ]
 
