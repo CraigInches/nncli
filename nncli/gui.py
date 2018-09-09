@@ -179,75 +179,75 @@ class NncliGui:
                                          palette,
                                          handle_mouse=False)
 
-        self.nncli_loop.set_alarm_in(0, self.gui_init_view, \
+        self.nncli_loop.set_alarm_in(0, self._gui_init_view, \
                 True if key else False)
 
     def run(self):
         """Run the GUI"""
         self.nncli_loop.run()
 
-    def gui_header_clear(self):
+    def _gui_header_clear(self):
         """Clear the console GUI header row"""
         self.master_frame.contents['header'] = (None, None)
         self.nncli_loop.draw_screen()
 
-    def gui_header_set(self, widget):
+    def _gui_header_set(self, widget):
         """Set the content of the console GUI header row"""
         self.master_frame.contents['header'] = (widget, None)
         self.nncli_loop.draw_screen()
 
-    def gui_footer_log_clear(self):
+    def _gui_footer_log_clear(self):
         """Clear the log at the bottom of the GUI"""
-        gui = self.gui_footer_input_get()
+        gui = self._gui_footer_input_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([urwid.Pile([]), urwid.Pile([gui])]), None)
         self.nncli_loop.draw_screen()
 
-    def gui_footer_log_set(self, pile):
+    def _gui_footer_log_set(self, pile):
         """Set the log at the bottom of the GUI"""
-        gui = self.gui_footer_input_get()
+        gui = self._gui_footer_input_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([urwid.Pile(pile), urwid.Pile([gui])]), None)
         self.nncli_loop.draw_screen()
 
-    def gui_footer_log_get(self):
+    def _gui_footer_log_get(self):
         """Get the log at the bottom of the GUI"""
         return self.master_frame.contents['footer'][0].contents[0][0]
 
-    def gui_footer_input_clear(self):
+    def _gui_footer_input_clear(self):
         """Clear the input at the bottom of the GUI"""
-        pile = self.gui_footer_log_get()
+        pile = self._gui_footer_log_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([urwid.Pile([pile]), urwid.Pile([])]), None)
         self.nncli_loop.draw_screen()
 
-    def gui_footer_input_set(self, gui):
+    def _gui_footer_input_set(self, gui):
         """Set the input at the bottom of the GUI"""
-        pile = self.gui_footer_log_get()
+        pile = self._gui_footer_log_get()
         self.master_frame.contents['footer'] = \
                 (urwid.Pile([urwid.Pile([pile]), urwid.Pile([gui])]), None)
         self.nncli_loop.draw_screen()
 
-    def gui_footer_input_get(self):
+    def _gui_footer_input_get(self):
         """Get the input at the bottom of the GUI"""
         return self.master_frame.contents['footer'][0].contents[1][0]
 
-    def gui_footer_focus_input(self):
+    def _gui_footer_focus_input(self):
         """Set the GUI focus to the input at the bottom of the GUI"""
         self.master_frame.focus_position = 'footer'
         self.master_frame.contents['footer'][0].focus_position = 1
 
-    def gui_body_set(self, widget):
+    def _gui_body_set(self, widget):
         """Set the GUI body"""
         self.master_frame.contents['body'] = (widget, None)
-        self.gui_update_status_bar()
+        self._gui_update_status_bar()
         self.nncli_loop.draw_screen()
 
-    def gui_body_get(self):
+    def _gui_body_get(self):
         """Get the GUI body"""
         return self.master_frame.contents['body'][0]
 
-    def gui_body_focus(self):
+    def _gui_body_focus(self):
         """Set the GUI focus to the body"""
         self.master_frame.focus_position = 'body'
 
@@ -268,63 +268,63 @@ class NncliGui:
                 )
         self.view_titles.focus_note(cur_key)
 
-        if self.gui_body_get().__class__ == view_note.ViewNote:
+        if self._gui_body_get().__class__ == view_note.ViewNote:
             self.view_note.update_note_view()
 
-        self.gui_update_status_bar()
+        self._gui_update_status_bar()
 
-    def gui_update_status_bar(self):
+    def _gui_update_status_bar(self):
         """Update the GUI status bar"""
         if self.status_bar != 'yes':
-            self.gui_header_clear()
+            self._gui_header_clear()
         else:
-            self.gui_header_set(self.gui_body_get().get_status_bar())
+            self._gui_header_set(self._gui_body_get().get_status_bar())
 
-    def gui_switch_frame_body(self, new_view, save_current_view=True):
+    def _gui_switch_frame_body(self, new_view, save_current_view=True):
         """
         Switch the body frame of the GUI. Used to switch to a new
         view
         """
         if new_view is None:
             if not self.last_view:
-                self.gui_stop()
+                self._gui_stop()
             else:
-                self.gui_body_set(self.last_view.pop())
+                self._gui_body_set(self.last_view.pop())
         else:
-            if self.gui_body_get().__class__ != new_view.__class__:
+            if self._gui_body_get().__class__ != new_view.__class__:
                 if save_current_view:
-                    self.last_view.append(self.gui_body_get())
-                self.gui_body_set(new_view)
+                    self.last_view.append(self._gui_body_get())
+                self._gui_body_set(new_view)
 
-    def delete_note_callback(self, key, delete):
+    def _delete_note_callback(self, key, delete):
         """Update the GUI after deleting a note"""
         if not delete:
             return
         self.ndb.set_note_deleted(key, True)
 
-        if self.gui_body_get().__class__ == view_titles.ViewTitles:
+        if self._gui_body_get().__class__ == view_titles.ViewTitles:
             self.view_titles.update_note_title()
 
-        self.gui_update_status_bar()
+        self._gui_update_status_bar()
         self.ndb.sync_worker_go()
 
-    def gui_yes_no_input(self, args, yes_no):
+    def _gui_yes_no_input(self, args, yes_no):
         """Create a yes/no input dialog at the GUI footer"""
-        self.gui_footer_input_clear()
-        self.gui_body_focus()
-        self.master_frame.keypress = self.gui_frame_keypress
+        self._gui_footer_input_clear()
+        self._gui_body_focus()
+        self.master_frame.keypress = self._gui_frame_keypress
         args[0](args[1],
                 True if yes_no in ['YES', 'Yes', 'yes', 'Y', 'y'] \
                         else False
                 )
 
-    def gui_search_input(self, args, search_string):
+    def _gui_search_input(self, args, search_string):
         """Create a search input dialog at the GUI footer"""
-        self.gui_footer_input_clear()
-        self.gui_body_focus()
-        self.master_frame.keypress = self.gui_frame_keypress
+        self._gui_footer_input_clear()
+        self._gui_body_focus()
+        self.master_frame.keypress = self._gui_frame_keypress
         if search_string:
-            if self.gui_body_get() == self.view_note:
+            if self._gui_body_get() == self.view_note:
                 self.config.state.search_direction = args[1]
                 self.view_note.search_note_view_next(
                         search_string=search_string,
@@ -336,45 +336,45 @@ class NncliGui:
                         args[0],
                         sort_mode=self.config.state.current_sort_mode
                         )
-                self.gui_body_set(self.view_titles)
+                self._gui_body_set(self.view_titles)
 
-    def gui_category_input(self, args, category):
+    def _gui_category_input(self, args, category):
         """Create a category input at the GUI footer"""
-        self.gui_footer_input_clear()
-        self.gui_body_focus()
-        self.master_frame.keypress = self.gui_frame_keypress
+        self._gui_footer_input_clear()
+        self._gui_body_focus()
+        self.master_frame.keypress = self._gui_frame_keypress
         if category is not None:
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 note = self.view_titles.note_list \
                         [self.view_titles.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = self.view_note.note
 
             self.ndb.set_note_category(note['localkey'], category)
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 self.view_titles.update_note_title()
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 self.view_note.update_note_view()
 
-            self.gui_update_status_bar()
+            self._gui_update_status_bar()
             self.ndb.sync_worker_go()
 
-    def gui_pipe_input(self, args, cmd):
+    def _gui_pipe_input(self, args, cmd):
         """Create a pipe input dialog at the GUI footoer"""
-        self.gui_footer_input_clear()
-        self.gui_body_focus()
-        self.master_frame.keypress = self.gui_frame_keypress
+        self._gui_footer_input_clear()
+        self._gui_body_focus()
+        self.master_frame.keypress = self._gui_frame_keypress
         if cmd is not None:
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 note = self.view_titles.note_list \
                         [self.view_titles.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = self.view_note.old_note \
                         if self.view_note.old_note \
                         else self.view_note.note
             try:
-                self.gui_clear()
+                self._gui_clear()
                 pipe = subprocess.Popen(cmd, stdin=subprocess.PIPE, shell=True)
                 pipe.communicate(note['content'].encode('utf-8'))
                 pipe.stdin.close()
@@ -382,23 +382,23 @@ class NncliGui:
             except OSError as ex:
                 self.log('Pipe error: %s' % ex)
             finally:
-                self.gui_reset()
+                self._gui_reset()
 
     # pylint: disable=too-many-return-statements, too-many-branches
     # pylint: disable=too-many-statements
-    def gui_frame_keypress(self, size, key):
+    def _gui_frame_keypress(self, size, key):
         """Keypress handler for the GUI"""
         # convert space character into name
         if key == ' ':
             key = 'space'
 
-        contents = self.gui_body_get()
+        contents = self._gui_body_get()
 
         if key == self.config.get_keybind('quit'):
-            self.gui_switch_frame_body(None)
+            self._gui_switch_frame_body(None)
 
         elif key == self.config.get_keybind('help'):
-            self.gui_switch_frame_body(self.view_help)
+            self._gui_switch_frame_body(self.view_help)
 
         elif key == self.config.get_keybind('sync'):
             self.ndb.last_sync = 0
@@ -406,7 +406,7 @@ class NncliGui:
 
         elif key == self.config.get_keybind('view_log'):
             self.view_log.update_log()
-            self.gui_switch_frame_body(self.view_log)
+            self._gui_switch_frame_body(self.view_log)
 
         elif key == self.config.get_keybind('down'):
             if not contents.body.positions():
@@ -490,7 +490,7 @@ class NncliGui:
                                   coming_from='below')
 
         elif key == self.config.get_keybind('view_next_note'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             if not self.view_titles.body.positions():
@@ -504,10 +504,10 @@ class NncliGui:
                             note_list[self.view_titles. \
                             focus_position].note['localkey']
                     )
-            self.gui_switch_frame_body(self.view_note)
+            self._gui_switch_frame_body(self.view_note)
 
         elif key == self.config.get_keybind('view_prev_note'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             if not self.view_titles.body.positions():
@@ -520,7 +520,7 @@ class NncliGui:
                             note_list[self.view_titles. \
                             focus_position].note['localkey']
                     )
-            self.gui_switch_frame_body(self.view_note)
+            self._gui_switch_frame_body(self.view_note)
 
         elif key == self.config.get_keybind('status'):
             if self.status_bar == 'yes':
@@ -529,12 +529,12 @@ class NncliGui:
                 self.status_bar = self.config.get_config('status_bar')
 
         elif key == self.config.get_keybind('create_note'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
-            self.gui_clear()
+            self._gui_clear()
             content = exec_cmd_on_note(None, self.config, self, self.logger)
-            self.gui_reset()
+            self._gui_reset()
 
             if content:
                 self.log('New note created')
@@ -545,22 +545,22 @@ class NncliGui:
         elif key == self.config.get_keybind('edit_note') or \
              key == self.config.get_keybind('view_note_ext') or \
              key == self.config.get_keybind('view_note_json'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+               self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 if key == self.config.get_keybind('edit_note'):
                     note = contents.note
                 else:
                     note = contents.old_note if contents.old_note \
                             else contents.note
 
-            self.gui_clear()
+            self._gui_clear()
             if key == self.config.get_keybind('edit_note'):
                 content = exec_cmd_on_note(note, self.config, self,
                                            self.logger)
@@ -581,7 +581,7 @@ class NncliGui:
                         raw=True
                         )
 
-            self.gui_reset()
+            self._gui_reset()
 
             if not content:
                 return None
@@ -592,16 +592,16 @@ class NncliGui:
             if md5_old != md5_new:
                 self.log('Note updated')
                 self.ndb.set_note_content(note['localkey'], content)
-                if self.gui_body_get().__class__ == view_titles.ViewTitles:
+                if self._gui_body_get().__class__ == view_titles.ViewTitles:
                     contents.update_note_title()
-                else: # self.gui_body_get().__class__ == view_note.ViewNote:
+                else: # self._gui_body_get().__class__ == view_note.ViewNote:
                     contents.update_note_view()
                 self.ndb.sync_worker_go()
             else:
                 self.log('Note unchanged')
 
         elif key == self.config.get_keybind('view_note'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             if not contents.body.positions():
@@ -609,125 +609,125 @@ class NncliGui:
             self.view_note.update_note_view(
                     contents.note_list[contents.focus_position]. \
                             note['localkey'])
-            self.gui_switch_frame_body(self.view_note)
+            self._gui_switch_frame_body(self.view_note)
 
         elif key == self.config.get_keybind('pipe_note'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+               self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.old_note if contents.old_note else contents.note
 
-            self.gui_footer_input_set(
+            self._gui_footer_input_set(
                     urwid.AttrMap(
                             user_input.UserInput(
                                     self.config,
                                     key,
                                     '',
-                                    self.gui_pipe_input,
+                                    self._gui_pipe_input,
                                     None
                                     ),
                             'user_input_bar'
                             )
                     )
-            self.gui_footer_focus_input()
+            self._gui_footer_focus_input()
             self.master_frame.keypress = \
-                    self.gui_footer_input_get().keypress
+                    self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('note_delete'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+               self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
-            self.gui_footer_input_set(
+            self._gui_footer_input_set(
                     urwid.AttrMap(
                             user_input.UserInput(
                                     self.config,
                                     'Delete (y/n): ',
                                     '',
-                                    self.gui_yes_no_input,
+                                    self._gui_yes_no_input,
                                     [
-                                            self.delete_note_callback,
+                                            self._delete_note_callback,
                                             note['localkey']
                                     ]
                                     ),
                             'user_input_bar'
                             )
                     )
-            self.gui_footer_focus_input()
+            self._gui_footer_focus_input()
             self.master_frame.keypress = \
-                    self.gui_footer_input_get().keypress
+                    self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('note_favorite'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+               self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
             favorite = not note['favorite']
 
             self.ndb.set_note_favorite(note['localkey'], favorite)
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 contents.update_note_title()
 
             self.ndb.sync_worker_go()
 
         elif key == self.config.get_keybind('note_category'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-               self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+               self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_titles.ViewTitles:
+            if self._gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self.gui_body_get().__class__ == view_note.ViewNote:
+            else: # self._gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
-            self.gui_footer_input_set(
+            self._gui_footer_input_set(
                     urwid.AttrMap(
                             user_input.UserInput(
                                     self.config,
                                     'Category: ',
                                     note['category'],
-                                    self.gui_category_input,
+                                    self._gui_category_input,
                                     None
                                     ),
                             'user_input_bar'
                             )
                     )
-            self.gui_footer_focus_input()
+            self._gui_footer_focus_input()
             self.master_frame.keypress = \
-                    self.gui_footer_input_get().keypress
+                    self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('search_gstyle') or \
              key == self.config.get_keybind('search_regex') or \
              key == self.config.get_keybind('search_prev_gstyle') or \
              key == self.config.get_keybind('search_prev_regex'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
-                 self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
+                 self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self.gui_body_get().__class__ == view_note.ViewNote:
+            if self._gui_body_get().__class__ == view_note.ViewNote:
                 if key == self.config.get_keybind('search_prev_gstyle') or \
                      key == self.config.get_keybind('search_prev_regex'):
                     self.view_note.search_direction = 'backward'
@@ -750,67 +750,67 @@ class NncliGui:
                                     '/' if options[1] == 'forward'
                                     else '?')
 
-            self.gui_footer_input_set(
+            self._gui_footer_input_set(
                     urwid.AttrMap(
                             user_input.UserInput(
                                     self.config,
                                     caption,
                                     '',
-                                    self.gui_search_input,
+                                    self._gui_search_input,
                                     options
                                     ),
                             'user_input_bar'
                             )
                     )
-            self.gui_footer_focus_input()
+            self._gui_footer_focus_input()
             self.master_frame.keypress = \
-                    self.gui_footer_input_get().keypress
+                    self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('search_next'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.search_note_view_next()
 
         elif key == self.config.get_keybind('search_prev'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.search_note_view_prev()
 
         elif key == self.config.get_keybind('clear_search'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.view_titles.update_note_list(
                     None,
                     sort_mode=self.config.state.current_sort_mode
                     )
-            self.gui_body_set(self.view_titles)
+            self._gui_body_set(self.view_titles)
 
         elif key == self.config.get_keybind('sort_date'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'date'
             self.view_titles.sort_note_list('date')
 
         elif key == self.config.get_keybind('sort_alpha'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'alpha'
             self.view_titles.sort_note_list('alpha')
 
         elif key == self.config.get_keybind('sort_categories'):
-            if self.gui_body_get().__class__ != view_titles.ViewTitles:
+            if self._gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'categories'
             self.view_titles.sort_note_list('categories')
 
         elif key == self.config.get_keybind('copy_note_text'):
-            if self.gui_body_get().__class__ != view_note.ViewNote:
+            if self._gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.copy_note_text()
@@ -818,31 +818,31 @@ class NncliGui:
         else:
             return contents.keypress(size, key)
 
-        self.gui_update_status_bar()
+        self._gui_update_status_bar()
         return None
 
-    def gui_init_view(self, loop, show_note):
+    def _gui_init_view(self, loop, show_note):
         """Initialize the GUI"""
-        self.master_frame.keypress = self.gui_frame_keypress
-        self.gui_body_set(self.view_titles)
+        self.master_frame.keypress = self._gui_frame_keypress
+        self._gui_body_set(self.view_titles)
 
         if show_note:
             # note that title view set first to prime the view stack
-            self.gui_switch_frame_body(self.view_note)
+            self._gui_switch_frame_body(self.view_note)
 
         self.thread_sync.start()
 
-    def gui_clear(self):
+    def _gui_clear(self):
         """Clear the GUI"""
         self.nncli_loop.widget = urwid.Filler(urwid.Text(''))
         self.nncli_loop.draw_screen()
 
-    def gui_reset(self):
+    def _gui_reset(self):
         """Reset the GUI"""
         self.nncli_loop.widget = self.master_frame
         self.nncli_loop.draw_screen()
 
-    def gui_stop(self):
+    def _gui_stop(self):
         """Stop the GUI"""
         # don't exit if there are any notes not yet saved to the disk
 
@@ -851,7 +851,7 @@ class NncliGui:
         # ref https://github.com/insanum/sncli/issues/18#issuecomment-105517773
         if self.ndb.verify_all_saved():
             # clear the screen and exit the urwid run loop
-            self.gui_clear()
+            self._gui_clear()
             raise urwid.ExitMainLoop()
         else:
             self.log('WARNING: Not all notes saved'
@@ -875,15 +875,15 @@ class NncliGui:
             log_pile.append(urwid.AttrMap(urwid.Text(log), 'log'))
 
         if self.config.state.verbose:
-            self.gui_footer_log_set(log_pile)
+            self._gui_footer_log_set(log_pile)
 
         self.nncli_loop.set_alarm_in(
                 int(self.config.get_config('log_timeout')),
-                self.log_timeout, None)
+                self._log_timeout, None)
 
         self.log_lock.release()
 
-    def log_timeout(self, loop, arg):
+    def _log_timeout(self, loop, arg):
         """
         Run periodically to check for new log entries to append to
         the GUI footer
@@ -893,7 +893,7 @@ class NncliGui:
         self.log_alarms -= 1
 
         if self.log_alarms == 0:
-            self.gui_footer_log_clear()
+            self._gui_footer_log_clear()
             self.logs = []
         else:
             # for some reason having problems with this being empty?
@@ -906,6 +906,6 @@ class NncliGui:
                 log_pile.append(urwid.AttrMap(urwid.Text(log), 'log'))
 
             if self.config.state.verbose:
-                self.gui_footer_log_set(log_pile)
+                self._gui_footer_log_set(log_pile)
 
         self.log_lock.release()
