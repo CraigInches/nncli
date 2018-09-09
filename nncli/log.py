@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 
 import os
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, too-few-public-methods
 class Logger:
     """Handles logging for the application"""
     def __init__(self, config):
