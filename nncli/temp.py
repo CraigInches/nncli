@@ -1,42 +1,50 @@
 # -*- coding: utf-8 -*-
-
-import os, json, tempfile
+"""temp module"""
+import json
+import os
+import tempfile
 
 def tempfile_create(note, raw=False, tempdir=None):
+    """create a temp file"""
     if raw:
         # dump the raw json of the note
-        tf = tempfile.NamedTemporaryFile(suffix='.json', delete=False, dir=tempdir)
+        tfile = tempfile.NamedTemporaryFile(suffix='.json',
+                                            delete=False, dir=tempdir)
 
         contents = json.dumps(note, indent=2)
-        tf.write(contents.encode('utf-8'))
-        tf.flush()
+        tfile.write(contents.encode('utf-8'))
+        tfile.flush()
     else:
         ext = '.mkd'
-        tf = tempfile.NamedTemporaryFile(suffix=ext, delete=False, dir=tempdir)
+        tfile = tempfile.NamedTemporaryFile(suffix=ext, delete=False,
+                                            dir=tempdir)
         if note:
             contents = note['content']
-            tf.write(contents.encode('utf-8'))
-        tf.flush()
-    return tf
+            tfile.write(contents.encode('utf-8'))
+        tfile.flush()
+    return tfile
 
-def tempfile_delete(tf):
-    if tf:
-        tf.close()
-        os.unlink(tf.name)
+def tempfile_delete(tfile):
+    """delete a temp file"""
+    if tfile:
+        tfile.close()
+        os.unlink(tfile.name)
 
-def tempfile_name(tf):
-    if tf:
-        return tf.name
+def tempfile_name(tfile):
+    """get the name of a temp file"""
+    if tfile:
+        return tfile.name
     return ''
 
-def tempfile_content(tf):
+def tempfile_content(tfile):
+    """read the contents of the temp file"""
     # This 'hack' is needed because some editors use an intermediate temporary
     # file, and rename it to that of the correct file, overwriting it. This
     # means that the tf file handle won't be updated with the new contents, and
     # the tempfile must be re-opened and read
-    if not tf:
+    if not tfile:
         return None
 
-    with open(tf.name, 'rb') as f:
-        updated_tf_contents = f.read()
+    with open(tfile.name, 'rb') as temp:
+        updated_tf_contents = temp.read()
         return updated_tf_contents.decode('utf-8')

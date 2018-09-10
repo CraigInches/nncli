@@ -105,14 +105,14 @@ class NextcloudNote:
             self.status = 'online'
         except ConnectionError as ex:
             self.status = 'offline, connection error'
-            return ex, -1
+            raise ex
         except RequestException as ex:
             logging.debug('RESPONSE ERROR: %s', ex)
             logging.debug(traceback.print_exc())
             self.status = 'error updating note, check log'
-            return ex, -1
+            raise ex
         except ValueError as ex:
-            return ex, -1
+            raise ex
         #logging.debug('RESPONSE OK: ' + str(note))
         return note, 0
 
@@ -199,7 +199,7 @@ class NextcloudNote:
             self.status = 'online'
         except ConnectionError as ex:
             self.status = 'offline, connection error'
-            return ex, -1
+            raise ex
         except RequestException as ex:
-            return ex, -1
+            raise ex
         return {}, 0

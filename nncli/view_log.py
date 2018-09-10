@@ -1,32 +1,38 @@
 # -*- coding: utf-8 -*-
-
+"""view_log module"""
 import urwid
 
 class ViewLog(urwid.ListBox):
+    """
+    ViewLog class
 
+    This class defines the urwid view class for the log viewer
+    """
     def __init__(self, config):
         self.config = config
         super(ViewLog, self).__init__(urwid.SimpleFocusListWalker([]))
 
     def update_log(self):
+        """update the log"""
         lines = []
-        f = open(self.config.logfile)
-        for line in f:
-            lines.append(
-                urwid.AttrMap(urwid.Text(line.rstrip()),
-                                'note_content',
-                                'note_content_focus'))
-        f.close()
+        with open(self.config.logfile) as logfile:
+            for line in logfile:
+                lines.append(
+                        urwid.AttrMap(urwid.Text(line.rstrip()),
+                                      'note_content',
+                                      'note_content_focus')
+                        )
         if self.config.get_config('log_reversed') == 'yes':
             lines.reverse()
         self.body[:] = urwid.SimpleFocusListWalker(lines)
         self.focus_position = 0
 
     def get_status_bar(self):
-        cur   = -1
+        """get the log view status bar"""
+        cur = -1
         total = 0
-        if len(self.body.positions()) > 0:
-            cur   = self.focus_position
+        if self.body.positions():
+            cur = self.focus_position
             total = len(self.body.positions())
 
         status_title = \
@@ -40,7 +46,7 @@ class ViewLog(urwid.ListBox):
                                               str(total)),
                                    'status_bar'))
         return \
-            urwid.AttrMap(urwid.Columns([ status_title, status_index ]),
+            urwid.AttrMap(urwid.Columns([status_title, status_index]),
                           'status_bar')
 
     def keypress(self, size, key):

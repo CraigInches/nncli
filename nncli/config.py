@@ -8,6 +8,7 @@ import sys
 
 from appdirs import user_cache_dir, user_config_dir
 
+# pylint: disable=too-few-public-methods
 class Config:
     """A class to contain all configuration data for nncli"""
     class State:

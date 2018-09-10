@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-import datetime
+"""utils module"""
 import random
 import re
 import shlex
@@ -10,6 +9,7 @@ from subprocess import CalledProcessError
 
 from . import temp
 
+# pylint: disable=too-many-arguments,too-few-public-methods
 def get_editor(config, logger):
     """Get the editor"""
     editor = config.get_config('editor')
@@ -87,16 +87,21 @@ def generate_random_key():
     return '%030x' % (random.randrange(256**15),)
 
 def get_note_category(note):
+    """get a note category"""
     if 'category' in note:
         category = note['category'] if note['category'] is not None else ''
     else:
         category = ''
     return category
 
-# Returns a fixed length string:
-#   'X' - needs sync
-#   '*' - favorite
 def get_note_flags(note):
+    """
+    get the note flags
+
+    Returns a fixed length string:
+      'X' - needs sync
+      '*' - favorite
+    """
     flags = ''
     flags += 'X' if float(note['modified']) > float(note['syncdate']) else ' '
     if 'favorite' in note:
@@ -106,30 +111,40 @@ def get_note_flags(note):
     return flags
 
 def get_note_title(note):
+    """get the note title"""
     if 'title' in note:
         return note['title']
-    else:
-        return ''
+    return ''
 
-def note_favorite(n):
-    if 'favorite' in n:
-        return n['favorite']
-    else:
-        return False
+def note_favorite(note):
+    """
+    get the status of the note as a favorite
 
-def sort_by_title_favorite(a):
-    return (not note_favorite(a.note), get_note_title(a.note))
+    returns True if the note is marked as a favorite
+            False otherwise
+    """
+    if 'favorite' in note:
+        return note['favorite']
+    return False
+
+def sort_by_title_favorite(left):
+    """sort notes by title, favorites on top"""
+    return (not note_favorite(left.note), get_note_title(left.note))
 
 def sort_notes_by_categories(notes, favorite_ontop=False):
+    """
+    sort notes by category, optionally pushing favorites to the
+    top
+    """
     notes.sort(key=lambda i: (favorite_ontop and not note_favorite(i.note),
                               i.note.get('category'),
                               get_note_title(i.note)))
 
-def sort_by_modify_date_favorite(a):
-    if note_favorite(a.note):
-        return 100.0 * float(a.note.get('modified', 0))
-    else:
-        return float(a.note.get('modified', 0))
+def sort_by_modify_date_favorite(left):
+    """sort notest by modify date, favorites on top"""
+    if note_favorite(left.note):
+        return 100.0 * float(left.note.get('modified', 0))
+    return float(left.note.get('modified', 0))
 
 class KeyValueObject:
     """Store key=value pairs in this object and retrieve with o.key.
@@ -155,7 +170,8 @@ def build_regex_search(search_string):
     }
     if search_string:
         try:
-            search_string, flag_letters = re.match(r'^(.+?)(?:/([a-z]+))?$', search_string).groups()
+            search_string, flag_letters = \
+                    re.match(r'^(.+?)(?:/([a-z]+))?$', search_string).groups()
             flags = 0
             # if flags are given, OR together all the valid flags
             # see https://docs.python.org/3/library/re.html#re.compile

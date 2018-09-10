@@ -1,14 +1,25 @@
 # -*- coding: utf-8 -*-
+"""notes_db module"""
+import copy
+import glob
+import json
+import os
+import re
+import threading
+import time
+from requests.exceptions import RequestException
 
-import os, time, re, glob, json, copy, threading
 from . import utils
 from .nextcloud_note import NextcloudNote
-import logging
 
+# pylint: disable=too-many-instance-attributes, too-many-locals
+# pylint: disable=too-many-branches, too-many-statements
 class ReadError(RuntimeError):
+    """Exception thrown on a read error"""
     pass
 
 class WriteError(RuntimeError):
+    """Exception thrown on a write error"""
     pass
 
 class NotesDB():
@@ -17,13 +28,13 @@ class NotesDB():
     NextCloud Notes
     """
     def __init__(self, config, log, update_view=None):
-        self.config      = config
-        self.log         = log
+        self.config = config
+        self.log = log
         self.update_view = update_view
 
         self.last_sync = 0 # set to zero to trigger a full sync
         self.sync_lock = threading.Lock()
-        self.go_cond   = threading.Condition()
+        self.go_cond = threading.Condition()
 
         # create db dir if it does not exist
         if not os.path.exists(self.config.get_config('db_path')):
@@ -31,32 +42,35 @@ class NotesDB():
 
         now = int(time.time())
         # now read all .json files from disk
-        fnlist = glob.glob(self.helper_key_to_fname('*'))
+        fnlist = glob.glob(self._helper_key_to_fname('*'))
 
         self.notes = {}
 
-        for fn in fnlist:
+        for func in fnlist:
             try:
-                n = json.load(open(fn, 'r'))
-            except IOError as e:
-                raise ReadError ('Error opening {0}: {1}'.format(fn, str(e)))
-            except ValueError as e:
-                raise ReadError ('Error reading {0}: {1}'.format(fn, str(e)))
+                note = json.load(open(func, 'r'))
+            except IOError as ex:
+                raise ReadError('Error opening {0}: {1}'.format(func, str(ex)))
+            except ValueError as ex:
+                raise ReadError('Error reading {0}: {1}'.format(func, str(ex)))
             else:
                 # we always have a localkey, also when we don't have a
                 # note['id'] yet (no sync)
-                localkey = n.get('localkey', os.path.splitext(os.path.basename(fn))[0])
+                localkey = note.get(
+                        'localkey',
+                        os.path.splitext(os.path.basename(func))[0]
+                        )
                 # we maintain in memory a timestamp of the last save
                 # these notes have just been read, so at this moment
                 # they're in sync with the disc.
-                n['savedate'] = now
+                note['savedate'] = now
                 # set a localkey to each note in memory
                 # Note: 'id' is used only for syncing with server - 'localkey'
                 #       is used for everything else in nncli
-                n['localkey'] = localkey
+                note['localkey'] = localkey
 
                 # add the note to our database
-                self.notes[localkey] = n
+                self.notes[localkey] = note
 
         # initialise the NextCloud instance we're going to use
         # this does not yet need network access
@@ -65,14 +79,19 @@ class NotesDB():
                                   self.config.get_config('nn_host'))
 
     def set_update_view(self, update_view):
+        """Set the update_view method"""
         self.update_view = update_view
 
-    def filtered_notes_sort(self, filtered_notes, sort_mode='date'):
+    def _filtered_notes_sort(self, filtered_notes, sort_mode='date'):
+        """Sort filtered note set"""
         if sort_mode == 'date':
             if self.config.get_config('favorite_ontop') == 'yes':
-                filtered_notes.sort(key=utils.sort_by_modify_date_favorite, reverse=True)
+                filtered_notes.sort(key=utils.sort_by_modify_date_favorite,
+                                    reverse=True)
             else:
-                filtered_notes.sort(key=lambda o: -float(o.note.get('modified', 0)))
+                filtered_notes.sort(
+                        key=lambda o: -float(o.note.get('modified', 0))
+                        )
         elif sort_mode == 'alpha':
             if self.config.get_config('favorite_ontop') == 'yes':
                 filtered_notes.sort(key=utils.sort_by_title_favorite)
@@ -83,7 +102,8 @@ class NotesDB():
             utils.sort_notes_by_categories(filtered_notes, \
                     favorite_ontop=favorite)
 
-    def filter_notes(self, search_string=None, search_mode='gstyle', sort_mode='date'):
+    def filter_notes(self, search_string=None, search_mode='gstyle',
+                     sort_mode='date'):
         """Return list of notes filtered with search string.
 
         Based on the search mode that has been selected in self.config,
@@ -98,21 +118,24 @@ class NotesDB():
 
         if search_mode == 'gstyle':
             filtered_notes, match_regexp, active_notes = \
-                self.filter_notes_gstyle(search_string)
+                self._filter_notes_gstyle(search_string)
         else:
             filtered_notes, match_regexp, active_notes = \
-                self.filter_notes_regex(search_string)
+                self._filter_notes_regex(search_string)
 
-        self.filtered_notes_sort(filtered_notes, sort_mode)
+        self._filtered_notes_sort(filtered_notes, sort_mode)
 
         return filtered_notes, match_regexp, active_notes
 
-    def _helper_gstyle_categorymatch(self, cat_pats, note):
+    @staticmethod
+    def _helper_gstyle_categorymatch(cat_pats, note):
+        """Match categories using a Google-style search string"""
         # Returns:
         #  2 = match    - no category patterns specified
         #  1 = match    - all category patterns match a category on this
         #                 note
-        #  0 = no match - note has no category or not all category patterns match
+        #  0 = no match - note has no category or not all category
+        #                 patterns match
 
         if not cat_pats:
             # match because no category patterns were specified
@@ -121,16 +144,17 @@ class NotesDB():
         note_category = note.get('category')
 
         if not note_category:
-            # category patterns specified but note has no categories, so no match
+            # category patterns specified but note has no categories,
+            # so no match
             return 0
 
         # for each cat_pat, we have to find a matching category
         # .lower() used for case-insensitive search
         cat_pats_matched = 0
-        for tp in cat_pats:
-            tp = tp.lower()
-            for t in note_category:
-                if tp in t.lower():
+        for cat_pat in cat_pats:
+            cat_pat = cat_pat.lower()
+            for pat in note_category:
+                if cat_pat in pat.lower():
                     cat_pats_matched += 1
                     break
 
@@ -141,32 +165,36 @@ class NotesDB():
         # note doesn't match
         return 0
 
-    def _helper_gstyle_wordmatch(self, word_pats, content):
+    @staticmethod
+    def _helper_gstyle_wordmatch(word_pats, content):
+        """Match note contents based no a Google-style search string"""
         if not word_pats:
             return True
 
         word_pats_matched = 0
         lowercase_content = content.lower() # case insensitive search
-        for wp in word_pats:
-            wp = wp.lower() # case insensitive search
-            if wp in lowercase_content:
+        for word_pat in word_pats:
+            word_pat = word_pat.lower() # case insensitive search
+            if word_pat in lowercase_content:
                 word_pats_matched += 1
 
         if word_pats_matched == len(word_pats):
-            return True;
+            return True
 
         return False
 
-    def filter_notes_gstyle(self, search_string=None):
-
+    def _filter_notes_gstyle(self, search_string=None):
+        """Filter the notes based of a Google-style search string"""
         filtered_notes = []
         active_notes = 0
 
         if not search_string:
-            for k in self.notes:
-                n = self.notes[k]
+            for key in self.notes:
+                note = self.notes[key]
                 active_notes += 1
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
+                filtered_notes.append(
+                        utils.KeyValueObject(key=key, note=note, catfound=0)
+                        )
 
             return filtered_notes, [], active_notes
 
@@ -174,41 +202,48 @@ class NotesDB():
         # group1: multiple words in quotes
         # group2: single words
 
-        # example result for: 'category:category1 category:category2 word1 "word2 word3" category:category3'
+        # example result for: 'category:category1 category:category2
+        # word1 "word2 word3" category:category3'
         # [ ('category1', '',            ''),
         #   ('category2', '',            ''),
         #   ('',     '',            'word1'),
         #   ('',     'word2 word3', ''),
         #   ('category3', '',            '') ]
 
-        groups = re.findall('category:([^\s]+)|"([^"]+)"|([^\s]+)', search_string)
+        groups = re.findall(
+                r'category:([^\s]+)|"([^"]+)"|([^\s]+)', search_string
+                )
         all_pats = [[] for _ in range(3)]
 
         # we end up with [[cat_pats],[multi_word_pats],[single_word_pats]]
-        for g in groups:
+        for group in groups:
             for i in range(3):
-                if g[i]: all_pats[i].append(g[i])
+                if group[i]:
+                    all_pats[i].append(group[i])
 
-        for k in self.notes:
-            n = self.notes[k]
+        for key in self.notes:
+            note = self.notes[key]
 
             active_notes += 1
 
-            catmatch = self._helper_gstyle_categorymatch(all_pats[0], n)
+            catmatch = self._helper_gstyle_categorymatch(all_pats[0],
+                                                         note)
 
             word_pats = all_pats[1] + all_pats[2]
 
             if catmatch and \
-               self._helper_gstyle_wordmatch(word_pats, n.get('content')):
+               self._helper_gstyle_wordmatch(word_pats, note.get('content')):
                 # we have a note that can go through!
                 filtered_notes.append(
-                    utils.KeyValueObject(key=k,
-                                         note=n,
-                                         catfound=1 if catmatch == 1 else 0))
+                        utils.KeyValueObject(key=key,
+                                             note=note,
+                                             catfound=1 \
+                                                     if catmatch == 1 \
+                                                     else 0))
 
         return filtered_notes, '|'.join(all_pats[1] + all_pats[2]), active_notes
 
-    def filter_notes_regex(self, search_string=None):
+    def _filter_notes_regex(self, search_string=None):
         """
         Return a list of notes filtered using the regex search_string.
         Each element in the list is a tuple (local_key, note).
@@ -218,32 +253,40 @@ class NotesDB():
         filtered_notes = []
         active_notes = 0 # total number of notes, including deleted ones
 
-        for k in self.notes:
-            n = self.notes[k]
+        for key in self.notes:
+            note = self.notes[key]
 
             active_notes += 1
 
             if not sspat:
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
+                filtered_notes.append(
+                        utils.KeyValueObject(key=key, note=note, catfound=0)
+                        )
                 continue
 
             if self.config.get_config('search_categories') == 'yes':
                 cat_matched = False
-                for t in n.get('category'):
-                    if sspat.search(t):
+                for cat in note.get('category'):
+                    if sspat.search(cat):
                         cat_matched = True
-                        filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=1))
+                        filtered_notes.append(
+                                utils.KeyValueObject(key=key,
+                                                     note=note, catfound=1)
+                                )
                         break
                 if cat_matched:
                     continue
 
-            if sspat.search(n.get('content')):
-                filtered_notes.append(utils.KeyValueObject(key=k, note=n, catfound=0))
+            if sspat.search(note.get('content')):
+                filtered_notes.append(
+                        utils.KeyValueObject(key=key, note=note, catfound=0)
+                        )
 
         match_regexp = search_string if sspat else ''
         return filtered_notes, match_regexp, active_notes
 
     def import_note(self, note):
+        """Import a note into the database"""
         # need to get a key unique to this database. not really important
         # what it is, as long as it's unique.
         new_key = note['id'] if note.get('id') else utils.generate_random_key()
@@ -255,21 +298,23 @@ class NotesDB():
         try:
             modified = float(note.get('modified', timestamp))
         except ValueError:
-            raise ValueError('date fields must be numbers or string representations of numbers')
+            raise ValueError('date fields must be numbers or string'
+                             'representations of numbers')
 
         # note has no internal key yet.
-        new_note = {
-                    'content'  : note.get('content', ''),
-                    'modified' : modified,
-                    'title'    : note.get('title'),
-                    'category' : note.get('category') \
-                            if note.get('category') is not None \
-                            else '',
-                    'savedate'   : 0, # never been written to disc
-                    'syncdate'   : 0, # never been synced with server
-                    'favorite' : False,
-                    'deleted'  : False
-                   }
+        new_note = \
+                {
+                        'content'  : note.get('content', ''),
+                        'modified' : modified,
+                        'title'    : note.get('title'),
+                        'category' : note.get('category') \
+                                if note.get('category') is not None \
+                                else '',
+                        'savedate'   : 0, # never been written to disc
+                        'syncdate'   : 0, # never been synced with server
+                        'favorite' : False,
+                        'deleted'  : False
+                }
 
         # sanity check all note values
         if not isinstance(new_note['content'], str):
@@ -290,6 +335,7 @@ class NotesDB():
         return new_key
 
     def create_note(self, content):
+        """Create a new note in the database"""
         # need to get a key unique to this database. not really important
         # what it is, as long as it's unique.
         new_key = utils.generate_random_key()
@@ -300,84 +346,95 @@ class NotesDB():
         title = content.split('\n')[0]
 
         # note has no internal key yet.
-        new_note = {
-                    'localkey' : new_key,
-                    'content'  : content,
-                    'modified' : timestamp,
-                    'category' : '',
-                    'savedate' : 0, # never been written to disc
-                    'syncdate' : 0, # never been synced with server
-                    'favorite' : False,
-                    'deleted'  : False,
-                    'title'    : title
-                   }
+        new_note = \
+                {
+                        'localkey' : new_key,
+                        'content'  : content,
+                        'modified' : timestamp,
+                        'category' : '',
+                        'savedate' : 0, # never been written to disc
+                        'syncdate' : 0, # never been synced with server
+                        'favorite' : False,
+                        'deleted'  : False,
+                        'title'    : title
+                }
 
         self.notes[new_key] = new_note
 
         return new_key
 
     def get_note(self, key):
+        """Get a note from the database"""
         return self.notes[key]
 
-    def get_note_category(self, key):
+    def _get_note_category(self, key):
+        """Get a category for a note"""
         return self.notes[key].get('category')
 
-    def flag_what_changed(self, note, what_changed):
+    @staticmethod
+    def _flag_what_changed(note, what_changed):
+        """Flag a note field as changed"""
         if 'what_changed' not in note:
             note['what_changed'] = []
         if what_changed not in note['what_changed']:
             note['what_changed'].append(what_changed)
 
     def set_note_deleted(self, key, deleted):
-        n = self.notes[key]
-        old_deleted = n['deleted'] if 'deleted' in n else 0
+        """Mark a note for deletion"""
+        note = self.notes[key]
+        old_deleted = note['deleted'] if 'deleted' in note else 0
         if old_deleted != deleted:
-            n['deleted'] = deleted
-            n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'deleted')
+            note['deleted'] = deleted
+            note['modified'] = int(time.time())
+            self._flag_what_changed(note, 'deleted')
             self.log('Note marked for deletion (key={0})'.format(key))
 
     def set_note_content(self, key, content):
-        n = self.notes[key]
-        old_content = n.get('content')
+        """Set the content of a note in the database"""
+        note = self.notes[key]
+        old_content = note.get('content')
         if content != old_content:
-            n['content'] = content
-            n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'content')
+            note['content'] = content
+            note['modified'] = int(time.time())
+            self._flag_what_changed(note, 'content')
             self.log('Note content updated (key={0})'.format(key))
 
     def set_note_category(self, key, category):
-        n = self.notes[key]
-        old_category = n.get('category')
+        """Set the category of a note in the database"""
+        note = self.notes[key]
+        old_category = note.get('category')
         if category != old_category:
-            n['category'] = category
-            n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'category')
+            note['category'] = category
+            note['modified'] = int(time.time())
+            self._flag_what_changed(note, 'category')
             self.log('Note category updated (key={0})'.format(key))
 
     def set_note_favorite(self, key, favorite):
-        n = self.notes[key]
-        old_favorite = utils.note_favorite(n)
+        """Mark a note in the database as a favorite"""
+        note = self.notes[key]
+        old_favorite = utils.note_favorite(note)
         if favorite != old_favorite:
-            n['favorite'] = favorite
-            n['modified'] = int(time.time())
-            self.flag_what_changed(n, 'favorite')
+            note['favorite'] = favorite
+            note['modified'] = int(time.time())
+            self._flag_what_changed(note, 'favorite')
             self.log('Note {0} (key={1})'. \
                     format('favorite' if favorite else \
                     'unfavorited', key))
 
-    def helper_key_to_fname(self, k):
+    def _helper_key_to_fname(self, k):
+        """Convert a note key into a file name"""
         return os.path.join(self.config.get_config('db_path'), str(k)) + '.json'
 
-    def helper_save_note(self, k, note):
+    def _helper_save_note(self, k, note):
+        """Save a note to the file system"""
         # Save a single note to disc.
-        fn = self.helper_key_to_fname(k)
-        json.dump(note, open(fn, 'w'), indent=2)
+        func = self._helper_key_to_fname(k)
+        json.dump(note, open(func, 'w'), indent=2)
 
         # record that we saved this to disc.
         note['savedate'] = int(time.time())
 
-    def sync_notes(self, server_sync=True, full_sync=True):
+    def _sync_notes(self, server_sync=True, full_sync=True):
         """Perform a full bi-directional sync with server.
 
         Psuedo-code algorithm for syncing:
@@ -412,15 +469,15 @@ class NotesDB():
 
         # 1. for any note changed locally, including new notes:
         #        save note to server, update note with response
-        for note_index, local_key in enumerate(self.notes.keys()):
-            n = self.notes[local_key]
+        for _, local_key in enumerate(self.notes.keys()):
+            note = self.notes[local_key]
 
-            if not n.get('id') or \
-               float(n.get('modified')) > float(n.get('syncdate')):
+            if not note.get('id') or \
+               float(note.get('modified')) > float(note.get('syncdate')):
 
-                savedate = float(n.get('savedate'))
-                if float(n.get('modified')) > savedate or \
-                   float(n.get('syncdate')) > savedate:
+                savedate = float(note.get('savedate'))
+                if float(note.get('modified')) > savedate or \
+                   float(note.get('syncdate')) > savedate:
                     # this will trigger a save to disk after sync algorithm
                     # we want this note saved even if offline or sync fails
                     local_updates[local_key] = True
@@ -431,77 +488,81 @@ class NotesDB():
                     continue
 
                 # only send required fields
-                cn = copy.deepcopy(n)
-                if 'what_changed' in n:
-                    del n['what_changed']
+                cnote = copy.deepcopy(note)
+                if 'what_changed' in note:
+                    del note['what_changed']
 
-                if 'localkey' in cn:
-                    del cn['localkey']
+                if 'localkey' in cnote:
+                    del cnote['localkey']
 
-                if 'minversion' in cn:
-                    del cn['minversion']
-                del cn['syncdate']
-                del cn['savedate']
-                del cn['deleted']
-                if 'etag' in cn:
-                    del cn['etag']
-                if 'title' in cn:
-                    del cn['title']
+                if 'minversion' in cnote:
+                    del cnote['minversion']
+                del cnote['syncdate']
+                del cnote['savedate']
+                del cnote['deleted']
+                if 'etag' in cnote:
+                    del cnote['etag']
+                if 'title' in cnote:
+                    del cnote['title']
 
-                if 'what_changed' in cn:
-                    if 'content' not in cn['what_changed'] \
-                            and 'category' not in cn['what_changed']:
-                        del cn['content']
-                    if 'category' not in cn['what_changed']:
-                        del cn['category']
-                    if 'favorite' not in cn['what_changed']:
-                        del cn['favorite']
-                    del cn['what_changed']
+                if 'what_changed' in cnote:
+                    if 'content' not in cnote['what_changed'] \
+                            and 'category' not in cnote['what_changed']:
+                        del cnote['content']
+                    if 'category' not in cnote['what_changed']:
+                        del cnote['category']
+                    if 'favorite' not in cnote['what_changed']:
+                        del cnote['favorite']
+                    del cnote['what_changed']
 
-                if n['deleted']:
-                    uret = self.note.delete_note(cn)
-                else:
-                    uret = self.note.update_note(cn)
+                try:
+                    if note['deleted']:
+                        uret = self.note.delete_note(cnote)
+                    else:
+                        uret = self.note.update_note(cnote)
 
-                if uret[1] == 0: # success
                     # if this is a new note our local key is not valid anymore
                     # merge the note we got back (content could be empty)
                     # record syncdate and save the note at the assigned key
                     del self.notes[local_key]
-                    k = uret[0].get('id')
-                    t = uret[0].get('title')
-                    c = uret[0].get('category')
-                    c = c if c is not None else ''
-                    n.update(uret[0])
-                    n['syncdate'] = now
-                    n['localkey'] = k
-                    n['category'] = c
-                    self.notes[k] = n
+                    key = uret[0].get('id')
+                    category = uret[0].get('category')
+                    category = category if category is not None else ''
+                    note.update(uret[0])
+                    note['syncdate'] = now
+                    note['localkey'] = key
+                    note['category'] = category
+                    self.notes[key] = note
 
-                    local_updates[k] = True
-                    if local_key != k:
+                    local_updates[key] = True
+                    if local_key != key:
                         # if local_key was a different key it should be deleted
                         local_deletes[local_key] = True
                         if local_key in local_updates:
                             del local_updates[local_key]
 
-                    self.log('Synced note to server (key={0})'.format(local_key))
-                else:
-                    self.log('ERROR: Failed to sync note to server (key={0})'.format(local_key))
+                    self.log(
+                            'Synced note to server (key={0})'.format(local_key)
+                            )
+                except (ConnectionError, RequestException, ValueError):
+                    self.log(
+                            'ERROR: Failed to sync note to server (key={0})'.
+                            format(local_key)
+                            )
                     sync_errors += 1
 
         # 2. get the note index
         if not server_sync:
-            nl = []
+            note_list = []
         else:
-            nl = self.note.get_note_list()
+            note_list = self.note.get_note_list()
 
-            if nl[1] == 0:  # success
-                nl = nl[0]
+            if note_list[1] == 0:  # success
+                note_list = note_list[0]
             else:
                 self.log('ERROR: Failed to get note list from server')
                 sync_errors += 1
-                nl = []
+                note_list = []
                 skip_remote_syncing = True
 
         # 3. for each remote note
@@ -509,44 +570,58 @@ class NotesDB():
         #           a new note and key is not in local store
         #            retrieve note, update note with response
         if not skip_remote_syncing:
-            for note_index, n in enumerate(nl):
-                k = n.get('id')
-                c = n.get('category') if n.get('category') is not None \
+            for _, note in enumerate(note_list):
+                key = note.get('id')
+                category = note.get('category') \
+                        if note.get('category') is not None \
                         else ''
-                server_keys[k] = True
+                server_keys[key] = True
                 # this works because in the prior step we rewrite local keys to
                 # server keys when we get an updated note back from the server
-                if k in self.notes:
+                if key in self.notes:
                     # we already have this note
                     # if the server note has a newer syncnum we need to get it
-                    if int(n.get('modified')) > int(self.notes[k].get('modified')):
-                        gret = self.note.get_note(k)
+                    if int(note.get('modified')) > \
+                            int(self.notes[key].get('modified')):
+                        gret = self.note.get_note(key)
                         if gret[1] == 0:
-                            self.notes[k].update(gret[0])
-                            local_updates[k] = True
-                            self.notes[k]['syncdate'] = now
-                            self.notes[k]['localkey'] = k
-                            self.notes[k]['category'] = c
-                            self.notes[k]['deleted'] = False
+                            self.notes[key].update(gret[0])
+                            local_updates[key] = True
+                            self.notes[key]['syncdate'] = now
+                            self.notes[key]['localkey'] = key
+                            self.notes[key]['category'] = category
+                            self.notes[key]['deleted'] = False
 
-                            self.log('Synced newer note from server (key={0})'.format(k))
+                            self.log(
+                                    'Synced newer note from server (key={0})'.
+                                    format(key)
+                                    )
                         else:
-                            self.log('ERROR: Failed to sync newer note from server (key={0})'.format(k))
+                            self.log(
+                                    'ERROR: Failed to sync newer note '
+                                    'from server (key={0})'.format(key)
+                                    )
                             sync_errors += 1
                 else:
                     # this is a new note
-                    gret = self.note.get_note(k)
+                    gret = self.note.get_note(key)
                     if gret[1] == 0:
-                        self.notes[k] = gret[0]
-                        local_updates[k] = True
-                        self.notes[k]['syncdate'] = now
-                        self.notes[k]['localkey'] = k
-                        self.notes[k]['category'] = c
-                        self.notes[k]['deleted'] = False
+                        self.notes[key] = gret[0]
+                        local_updates[key] = True
+                        self.notes[key]['syncdate'] = now
+                        self.notes[key]['localkey'] = key
+                        self.notes[key]['category'] = category
+                        self.notes[key]['deleted'] = False
 
-                        self.log('Synced new note from server (key={0})'.format(k))
+                        self.log(
+                                'Synced new note from server (key={0})'.
+                                format(key)
+                                )
                     else:
-                        self.log('ERROR: Failed syncing new note from server (key={0})'.format(k))
+                        self.log(
+                                'ERROR: Failed syncing new note from'
+                                'server (key={0})'.format(key)
+                                )
                         sync_errors += 1
 
         # 4. for each local note not in the index
@@ -562,22 +637,22 @@ class NotesDB():
 
         for k in list(local_updates.keys()):
             try:
-                self.helper_save_note(k, self.notes[k])
-            except WriteError as e:
-                raise WriteError (str(e))
-            self.log("Saved note to disk (key={0})".format(k))
+                self._helper_save_note(k, self.notes[k])
+            except WriteError as ex:
+                raise WriteError(str(ex))
+            self.log("Saved note to disk (key={0})".format(key))
 
         for k in list(local_deletes.keys()):
-            fn = self.helper_key_to_fname(k)
-            if os.path.exists(fn):
-                os.unlink(fn)
-                self.log("Deleted note from disk (key={0})".format(k))
+            fnote = self._helper_key_to_fname(k)
+            if os.path.exists(fnote):
+                os.unlink(fnote)
+                self.log("Deleted note from disk (key={0})".format(key))
 
         if not sync_errors:
             self.last_sync = sync_start_time
 
         # if there were any changes then update the current view
-        if len(local_updates) > 0 or len(local_deletes) > 0:
+        if local_updates or local_deletes:
             self.update_view()
 
         if server_sync and full_sync:
@@ -585,35 +660,41 @@ class NotesDB():
 
         return sync_errors
 
-    def get_note_status(self, key):
-        n = self.notes[key]
-        o = utils.KeyValueObject(saved=False, synced=False, modified=False)
-        modified = float(n['modified'])
-        savedate   = float(n['savedate'])
+    def _get_note_status(self, key):
+        """Get the note status"""
+        note = self.notes[key]
+        obj = utils.KeyValueObject(saved=False, synced=False, modified=False)
+        modified = float(note['modified'])
+        savedate = float(note['savedate'])
 
         if savedate > modified:
-            o.saved = True
-        return o
+            obj.saved = True
+        return obj
 
-    def verify_all_saved(self):
+    def _verify_all_saved(self):
+        """
+        Verify all notes in the local database are saved to the
+        server
+        """
         all_saved = True
         self.sync_lock.acquire()
         for k in list(self.notes.keys()):
-            o = self.get_note_status(k)
-            if not o.saved:
+            obj = self._get_note_status(k)
+            if not obj.saved:
                 all_saved = False
                 break
         self.sync_lock.release()
         return all_saved
 
     def sync_now(self, do_server_sync=True):
+        """Sync the notes to the server"""
         self.sync_lock.acquire()
-        self.sync_notes(server_sync=do_server_sync,
-                        full_sync=True if not self.last_sync else False)
+        self._sync_notes(server_sync=do_server_sync,
+                         full_sync=True if not self.last_sync else False)
         self.sync_lock.release()
 
-    # sync worker thread...
-    def sync_worker(self, do_server_sync):
+    def _sync_worker(self, do_server_sync):
+        """The sync worker thread"""
         time.sleep(1) # give some time to wait for GUI initialization
         self.log('Sync worker: started')
         self.sync_now(do_server_sync)
@@ -623,7 +704,8 @@ class NotesDB():
             self.sync_now(do_server_sync)
             self.go_cond.release()
 
-    def sync_worker_go(self):
+    def _sync_worker_go(self):
+        """Start the sync worker"""
         self.go_cond.acquire()
         self.go_cond.notify()
         self.go_cond.release()
