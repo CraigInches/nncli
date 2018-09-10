@@ -35,9 +35,9 @@ jobs:
       script: make test
       <<: *xenial-mixin
       python: 3.7
-    # - stage: lint
-    #   script: make lint
-    #   python: 3.6
+    - stage: lint
+      script: make lint
+      python: 3.6
     - stage: coverage
       script: make coverage
       after_success: coveralls

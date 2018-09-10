@@ -17,6 +17,8 @@ class NncliGui:
         self.config = config
         self.last_view = []
         self.status_bar = self.config.get_config('status_bar')
+        self.config.state.current_sort_mode = \
+                self.config.get_config('sort_mode')
 
 
         self.log_lock = threading.Lock()
@@ -243,7 +245,7 @@ class NncliGui:
         self._gui_update_status_bar()
         self.nncli_loop.draw_screen()
 
-    def _gui_body_get(self):
+    def gui_body_get(self):
         """Get the GUI body"""
         return self.master_frame.contents['body'][0]
 
@@ -268,7 +270,7 @@ class NncliGui:
                 )
         self.view_titles.focus_note(cur_key)
 
-        if self._gui_body_get().__class__ == view_note.ViewNote:
+        if self.gui_body_get().__class__ == view_note.ViewNote:
             self.view_note.update_note_view()
 
         self._gui_update_status_bar()
@@ -278,7 +280,7 @@ class NncliGui:
         if self.status_bar != 'yes':
             self._gui_header_clear()
         else:
-            self._gui_header_set(self._gui_body_get().get_status_bar())
+            self._gui_header_set(self.gui_body_get().get_status_bar())
 
     def _gui_switch_frame_body(self, new_view, save_current_view=True):
         """
@@ -291,9 +293,9 @@ class NncliGui:
             else:
                 self._gui_body_set(self.last_view.pop())
         else:
-            if self._gui_body_get().__class__ != new_view.__class__:
+            if self.gui_body_get().__class__ != new_view.__class__:
                 if save_current_view:
-                    self.last_view.append(self._gui_body_get())
+                    self.last_view.append(self.gui_body_get())
                 self._gui_body_set(new_view)
 
     def _delete_note_callback(self, key, delete):
@@ -302,7 +304,7 @@ class NncliGui:
             return
         self.ndb.set_note_deleted(key, True)
 
-        if self._gui_body_get().__class__ == view_titles.ViewTitles:
+        if self.gui_body_get().__class__ == view_titles.ViewTitles:
             self.view_titles.update_note_title()
 
         self._gui_update_status_bar()
@@ -324,7 +326,7 @@ class NncliGui:
         self._gui_body_focus()
         self.master_frame.keypress = self._gui_frame_keypress
         if search_string:
-            if self._gui_body_get() == self.view_note:
+            if self.gui_body_get() == self.view_note:
                 self.config.state.search_direction = args[1]
                 self.view_note.search_note_view_next(
                         search_string=search_string,
@@ -344,17 +346,17 @@ class NncliGui:
         self._gui_body_focus()
         self.master_frame.keypress = self._gui_frame_keypress
         if category is not None:
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 note = self.view_titles.note_list \
                         [self.view_titles.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = self.view_note.note
 
             self.ndb.set_note_category(note['localkey'], category)
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 self.view_titles.update_note_title()
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 self.view_note.update_note_view()
 
             self._gui_update_status_bar()
@@ -366,10 +368,10 @@ class NncliGui:
         self._gui_body_focus()
         self.master_frame.keypress = self._gui_frame_keypress
         if cmd is not None:
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 note = self.view_titles.note_list \
                         [self.view_titles.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = self.view_note.old_note \
                         if self.view_note.old_note \
                         else self.view_note.note
@@ -392,7 +394,7 @@ class NncliGui:
         if key == ' ':
             key = 'space'
 
-        contents = self._gui_body_get()
+        contents = self.gui_body_get()
 
         if key == self.config.get_keybind('quit'):
             self._gui_switch_frame_body(None)
@@ -490,7 +492,7 @@ class NncliGui:
                                   coming_from='below')
 
         elif key == self.config.get_keybind('view_next_note'):
-            if self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             if not self.view_titles.body.positions():
@@ -507,7 +509,7 @@ class NncliGui:
             self._gui_switch_frame_body(self.view_note)
 
         elif key == self.config.get_keybind('view_prev_note'):
-            if self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             if not self.view_titles.body.positions():
@@ -529,7 +531,7 @@ class NncliGui:
                 self.status_bar = self.config.get_config('status_bar')
 
         elif key == self.config.get_keybind('create_note'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self._gui_clear()
@@ -545,15 +547,15 @@ class NncliGui:
         elif key == self.config.get_keybind('edit_note') or \
              key == self.config.get_keybind('view_note_ext') or \
              key == self.config.get_keybind('view_note_json'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-               self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+               self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 if key == self.config.get_keybind('edit_note'):
                     note = contents.note
                 else:
@@ -592,16 +594,16 @@ class NncliGui:
             if md5_old != md5_new:
                 self.log('Note updated')
                 self.ndb.set_note_content(note['localkey'], content)
-                if self._gui_body_get().__class__ == view_titles.ViewTitles:
+                if self.gui_body_get().__class__ == view_titles.ViewTitles:
                     contents.update_note_title()
-                else: # self._gui_body_get().__class__ == view_note.ViewNote:
+                else: # self.gui_body_get().__class__ == view_note.ViewNote:
                     contents.update_note_view()
                 self.ndb.sync_worker_go()
             else:
                 self.log('Note unchanged')
 
         elif key == self.config.get_keybind('view_note'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             if not contents.body.positions():
@@ -612,15 +614,15 @@ class NncliGui:
             self._gui_switch_frame_body(self.view_note)
 
         elif key == self.config.get_keybind('pipe_note'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-               self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+               self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.old_note if contents.old_note else contents.note
 
             self._gui_footer_input_set(
@@ -640,15 +642,15 @@ class NncliGui:
                     self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('note_delete'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-               self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+               self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
             self._gui_footer_input_set(
@@ -671,36 +673,36 @@ class NncliGui:
                     self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('note_favorite'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-               self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+               self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
             favorite = not note['favorite']
 
             self.ndb.set_note_favorite(note['localkey'], favorite)
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 contents.update_note_title()
 
             self.ndb.sync_worker_go()
 
         elif key == self.config.get_keybind('note_category'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-               self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+               self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_titles.ViewTitles:
+            if self.gui_body_get().__class__ == view_titles.ViewTitles:
                 if not contents.body.positions():
                     return None
                 note = contents.note_list[contents.focus_position].note
-            else: # self._gui_body_get().__class__ == view_note.ViewNote:
+            else: # self.gui_body_get().__class__ == view_note.ViewNote:
                 note = contents.note
 
             self._gui_footer_input_set(
@@ -723,11 +725,11 @@ class NncliGui:
              key == self.config.get_keybind('search_regex') or \
              key == self.config.get_keybind('search_prev_gstyle') or \
              key == self.config.get_keybind('search_prev_regex'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles and \
-                 self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles and \
+                 self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
-            if self._gui_body_get().__class__ == view_note.ViewNote:
+            if self.gui_body_get().__class__ == view_note.ViewNote:
                 if key == self.config.get_keybind('search_prev_gstyle') or \
                      key == self.config.get_keybind('search_prev_regex'):
                     self.view_note.search_direction = 'backward'
@@ -767,19 +769,19 @@ class NncliGui:
                     self._gui_footer_input_get().keypress
 
         elif key == self.config.get_keybind('search_next'):
-            if self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.search_note_view_next()
 
         elif key == self.config.get_keybind('search_prev'):
-            if self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.search_note_view_prev()
 
         elif key == self.config.get_keybind('clear_search'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.view_titles.update_note_list(
@@ -789,28 +791,28 @@ class NncliGui:
             self._gui_body_set(self.view_titles)
 
         elif key == self.config.get_keybind('sort_date'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'date'
             self.view_titles.sort_note_list('date')
 
         elif key == self.config.get_keybind('sort_alpha'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'alpha'
             self.view_titles.sort_note_list('alpha')
 
         elif key == self.config.get_keybind('sort_categories'):
-            if self._gui_body_get().__class__ != view_titles.ViewTitles:
+            if self.gui_body_get().__class__ != view_titles.ViewTitles:
                 return key
 
             self.config.state.current_sort_mode = 'categories'
             self.view_titles.sort_note_list('categories')
 
         elif key == self.config.get_keybind('copy_note_text'):
-            if self._gui_body_get().__class__ != view_note.ViewNote:
+            if self.gui_body_get().__class__ != view_note.ViewNote:
                 return key
 
             self.view_note.copy_note_text()

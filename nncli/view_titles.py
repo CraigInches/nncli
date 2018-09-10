@@ -36,7 +36,7 @@ class ViewTitles(urwid.ListBox):
                     )
         self.body[:] = \
             urwid.SimpleFocusListWalker(self.get_note_titles())
-        if self.note_list:
+        if not self.note_list:
             self.log('No notes found!')
         else:
             self.focus_position = 0

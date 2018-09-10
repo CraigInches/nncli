@@ -367,10 +367,6 @@ class NotesDB():
         """Get a note from the database"""
         return self.notes[key]
 
-    def _get_note_category(self, key):
-        """Get a category for a note"""
-        return self.notes[key].get('category')
-
     @staticmethod
     def _flag_what_changed(note, what_changed):
         """Flag a note field as changed"""
@@ -671,7 +667,7 @@ class NotesDB():
             obj.saved = True
         return obj
 
-    def _verify_all_saved(self):
+    def verify_all_saved(self):
         """
         Verify all notes in the local database are saved to the
         server
@@ -693,7 +689,7 @@ class NotesDB():
                          full_sync=True if not self.last_sync else False)
         self.sync_lock.release()
 
-    def _sync_worker(self, do_server_sync):
+    def sync_worker(self, do_server_sync):
         """The sync worker thread"""
         time.sleep(1) # give some time to wait for GUI initialization
         self.log('Sync worker: started')
@@ -704,7 +700,7 @@ class NotesDB():
             self.sync_now(do_server_sync)
             self.go_cond.release()
 
-    def _sync_worker_go(self):
+    def sync_worker_go(self):
         """Start the sync worker"""
         self.go_cond.acquire()
         self.go_cond.notify()
