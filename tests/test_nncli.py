@@ -1,174 +1,60 @@
 # -*- coding: utf-8 -*-
-
+"""tests for nncli module"""
 import logging
 import os
 import pytest
 import shutil
 
-from logging.handlers import RotatingFileHandler
 import nncli.nncli
+from nncli.notes_db import ReadError
 
 @pytest.fixture
 def mock_nncli(mocker):
-    mocker.patch('logging.getLogger')
+    """mock the major interfaces for the Nncli class"""
     mocker.patch('nncli.nncli.NotesDB')
     mocker.patch('nncli.nncli.NncliGui')
+    mocker.patch('nncli.nncli.Config')
+    mocker.patch('nncli.nncli.Logger')
     mocker.patch('os.mkdir')
-    mocker.patch.object(RotatingFileHandler, '_open')
     mocker.patch('subprocess.check_output')
+    mocker.patch('os.path.exists',
+                 new=mocker.MagicMock(return_value=True))
 
-def mock_get_config(mocker, return_list):
-    mocker.patch.object(
-            nncli.nncli.Config,
-            'get_config',
-            new=mocker.MagicMock(side_effect=return_list)
-            )
-
-def assert_initialized():
-    assert logging.getLogger.call_count == 2
-    RotatingFileHandler._open.assert_called_once()
+def test_init_no_local_db(mocker, mock_nncli):
+    """test initialization when there is no local notes database"""
+    mocker.patch('os.path.exists',
+                 new=mocker.MagicMock(return_value=False))
+    mocker.patch.object(nncli.nncli.NotesDB, 'sync_now')
+    nn_obj = nncli.nncli.Nncli(False)
+    assert nn_obj.config.get_config.call_count == 2
+    nn_obj.ndb.set_update_view.assert_called_once()
     os.mkdir.assert_called_once()
+    nn_obj.ndb.sync_now.assert_called_once()
 
 def test_init(mocker, mock_nncli):
-    mock_get_config(mocker, ['what', 'what', 'duh', 'duh', 'duh'])
-    nn = nncli.nncli.Nncli(False)
-    assert_initialized()
+    """test nominal initialization"""
+    nn_obj = nncli.nncli.Nncli(False)
+    nn_obj.config.get_config.assert_called_once()
+    nn_obj.ndb.set_update_view.assert_called_once()
+    assert os.mkdir.call_count == 0
 
 def test_init_notesdb_fail(mocker, mock_nncli):
-    mock_get_config(mocker, ['what', 'what', 'duh', 'duh', 'duh'])
+    """test init when there is a notes database failure"""
+    mocker.patch('os.path.exists',
+                 new=mocker.MagicMock(return_value=True))
     mocker.patch('nncli.nncli.NotesDB',
-            new=mocker.MagicMock(side_effect=SystemExit)
-            )
+                 new=mocker.MagicMock(side_effect=ReadError)
+                )
     with pytest.raises(SystemExit):
         nn = nncli.nncli.Nncli(False)
 
-@pytest.mark.skip
-def test_exec_diff_on_note():
-    pass
-
-@pytest.mark.skip
-def test_gui_header_clear():
-    pass
-
-@pytest.mark.skip
-def test_gui_header_set():
-    pass
-
-@pytest.mark.skip
-def test_gui_header_get():
-    pass
-
-@pytest.mark.skip
-def test_gui_header_focus():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_log_clear():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_log_set():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_log_get():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_input_clear():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_input_set():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_input_get():
-    pass
-
-@pytest.mark.skip
-def test_gui_footer_focus_input():
-    pass
-
-@pytest.mark.skip
-def test_gui_body_clear():
-    pass
-
-@pytest.mark.skip
-def test_gui_body_set():
-    pass
-
-@pytest.mark.skip
-def test_gui_body_get():
-    pass
-
-@pytest.mark.skip
-def test_gui_body_focus():
-    pass
-
-@pytest.mark.skip
-def test_log_timeout():
-    pass
-
-@pytest.mark.skip
-def test_log():
-    pass
-
-@pytest.mark.skip
-def test_gui_update_view():
-    pass
-
-@pytest.mark.skip
-def test_gui_update_status_bar():
-    pass
-
-@pytest.mark.skip
-def test_gui_switch_frame_body():
-    pass
-
-@pytest.mark.skip
-def test_delete_note_callback():
-    pass
-
-@pytest.mark.skip
-def test_gui_yes_no_input():
-    pass
-
-@pytest.mark.skip
-def test_gui_search_input():
-    pass
-
-@pytest.mark.skip
-def test_gui_category_input():
-    pass
-
-@pytest.mark.skip
-def test_gui_pipe_input():
-    pass
-
-@pytest.mark.skip
-def test_gui_frame_keypress():
-    pass
-
-@pytest.mark.skip
-def test_gui_init_view():
-    pass
-
-@pytest.mark.skip
-def test_gui_clear():
-    pass
-
-@pytest.mark.skip
-def test_gui_reset():
-    pass
-
-@pytest.mark.skip
-def test_gui_stop():
-    pass
-
-@pytest.mark.skip
-def test_gui():
-    pass
+def test_gui(mocker, mock_nncli):
+    """test starting the gui"""
+    nn_obj = nncli.nncli.Nncli(False)
+    nn_obj.gui(0)
+    assert nn_obj.config.state.do_gui == True
+    assert nn_obj.ndb.log == nn_obj.nncli_gui.log
+    nn_obj.nncli_gui.run.assert_called_once()
 
 @pytest.mark.skip
 def test_cli_list_notes():
@@ -224,20 +110,4 @@ def test_cli_note_category_rm():
 
 @pytest.mark.skip
 def test_SIGINT_handler():
-    pass
-
-@pytest.mark.skip
-def test_usage():
-    pass
-
-@pytest.mark.skip
-def test_version():
-    pass
-
-@pytest.mark.skip
-def test_main():
-    pass
-
-@pytest.mark.skip
-def test_nncli_start():
     pass

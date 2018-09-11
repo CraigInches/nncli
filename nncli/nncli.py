@@ -49,12 +49,8 @@ class Nncli:
             self.config.state.verbose = True
             self.logger.log('nncli database doesn\'t exist,'
                             ' forcing full sync...')
-            self.sync_notes()
+            self.ndb.sync_now()
             self.config.state.verbose = verbose
-
-    def sync_notes(self):
-        """Sync notes with the server"""
-        self.ndb.sync_now(self.config.state.do_server_sync)
 
     def gui(self, key):
         """Method to initialize and display the GUI"""

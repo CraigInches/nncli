@@ -6,3 +6,4 @@ MANIFEST
 .pytest_cache/
 docs/build/
 .tox
+htmlcov/
