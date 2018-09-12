@@ -7,6 +7,7 @@ import shutil
 
 import nncli.nncli
 from nncli.notes_db import ReadError
+import nncli.utils
 
 @pytest.fixture
 def mock_nncli(mocker):
@@ -24,7 +25,6 @@ def test_init_no_local_db(mocker, mock_nncli):
     """test initialization when there is no local notes database"""
     mocker.patch('os.path.exists',
                  new=mocker.MagicMock(return_value=False))
-    mocker.patch.object(nncli.nncli.NotesDB, 'sync_now')
     nn_obj = nncli.nncli.Nncli(False)
     assert nn_obj.config.get_config.call_count == 2
     nn_obj.ndb.set_update_view.assert_called_once()
@@ -47,6 +47,7 @@ def test_init_notesdb_fail(mocker, mock_nncli):
                 )
     with pytest.raises(SystemExit):
         nn = nncli.nncli.Nncli(False)
+    os.path.exists.assert_called_once()
 
 def test_gui(mocker, mock_nncli):
     """test starting the gui"""
@@ -56,9 +57,25 @@ def test_gui(mocker, mock_nncli):
     assert nn_obj.ndb.log == nn_obj.nncli_gui.log
     nn_obj.nncli_gui.run.assert_called_once()
 
-@pytest.mark.skip
-def test_cli_list_notes():
-    pass
+def test_cli_list_notes(mocker, mock_nncli):
+    """test listing notes from the command line"""
+    test_note = (
+            [nncli.utils.KeyValueObject(key='test_key',
+             note='test_note')],
+            [],
+            []
+            )
+    mocker.patch('nncli.utils.get_note_flags',
+                 new=mocker.Mock(return_value='flg'))
+    mocker.patch('nncli.utils.get_note_title',
+                 new=mocker.Mock(return_value='test_title'))
+    mocker.patch('nncli.nncli.print')
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'filter_notes',
+                        new=mocker.Mock(return_value=test_note))
+    print(nn_obj.ndb.filter_notes)
+    nn_obj.cli_list_notes(False, 'test_search_string')
+    nncli.nncli.print.assert_called_once_with('test_key [flg] test_title')
 
 @pytest.mark.skip
 def test_cli_note_dump():
