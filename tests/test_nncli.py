@@ -73,17 +73,46 @@ def test_cli_list_notes(mocker, mock_nncli):
     nn_obj = nncli.nncli.Nncli(False)
     mocker.patch.object(nn_obj.ndb, 'filter_notes',
                         new=mocker.Mock(return_value=test_note))
-    print(nn_obj.ndb.filter_notes)
     nn_obj.cli_list_notes(False, 'test_search_string')
     nncli.nncli.print.assert_called_once_with('test_key [flg] test_title')
+    nncli.utils.get_note_flags.assert_called_once()
+    nncli.utils.get_note_title.assert_called_once()
 
-@pytest.mark.skip
-def test_cli_note_dump():
-    pass
+def test_cli_note_dump(mocker, mock_nncli):
+    test_note = {'modified': 12345,
+                 'id': 1,
+                 'localkey': 1,
+                 'content': 'test_content'}
+    mocker.patch('nncli.utils.get_note_flags',
+                 new=mocker.Mock(return_value='flg'))
+    mocker.patch('nncli.utils.get_note_title',
+                 new=mocker.Mock(return_value='test_title'))
+    mocker.patch('nncli.utils.get_note_category',
+                 new=mocker.Mock(return_value='test_category'))
+    mocker.patch('nncli.nncli.print')
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'get_note',
+                        new=mocker.Mock(return_value=test_note))
+    nn_obj.cli_note_dump(1)
+    assert nncli.nncli.print.call_count == 8
+    nn_obj.ndb.get_note.assert_called_once_with(1)
+    nncli.utils.get_note_flags.assert_called_once_with(test_note)
+    nncli.utils.get_note_title.assert_called_once_with(test_note)
+    nncli.utils.get_note_category.assert_called_once_with(test_note)
 
-@pytest.mark.skip
-def test_cli_dump_notes():
-    pass
+def test_cli_dump_notes(mocker, mock_nncli):
+    test_notes = (
+            [nncli.utils.KeyValueObject(key=1,
+             note={'key': 1})],
+            [],
+            []
+            )
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'filter_notes',
+                        new=mocker.Mock(return_value=test_notes))
+    mocker.patch.object(nn_obj, 'cli_note_dump')
+    nn_obj.cli_dump_notes(False, 'test_search_string')
+    nn_obj.cli_note_dump.assert_called_once_with(1)
 
 @pytest.mark.skip
 def test_cli_note_create():
