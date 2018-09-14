@@ -146,10 +146,6 @@ class Nncli:
                 self.logger.log('New note created')
                 self.ndb.import_note(note)
                 self.ndb.sync_now()
-            except json.decoder.JSONDecodeError as ex:
-                self.logger.log(
-                        '(IMPORT) Decoding JSON has failed: {}'.format(ex))
-                sys.exit(1)
             except ValueError as ex:
                 self.logger.log('(IMPORT) ValueError: {}'.format(ex))
                 sys.exit(1)
