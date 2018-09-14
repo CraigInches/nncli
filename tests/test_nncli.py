@@ -80,6 +80,7 @@ def test_cli_list_notes(mocker, mock_nncli):
     nncli.utils.get_note_title.assert_called_once()
 
 def test_cli_note_dump(mocker, mock_nncli):
+    """test dumping a note to the command line"""
     test_note = {'modified': 12345,
                  'id': 1,
                  'localkey': 1,
@@ -100,6 +101,25 @@ def test_cli_note_dump(mocker, mock_nncli):
     nncli.utils.get_note_flags.assert_called_once_with(test_note)
     nncli.utils.get_note_title.assert_called_once_with(test_note)
     nncli.utils.get_note_category.assert_called_once_with(test_note)
+
+def test_failed_cli_note_dump(mocker, mock_nncli):
+    """test failed note dump to the command line"""
+    mocker.patch('nncli.utils.get_note_flags',
+                 new=mocker.Mock(return_value='flg'))
+    mocker.patch('nncli.utils.get_note_title',
+                 new=mocker.Mock(return_value='test_title'))
+    mocker.patch('nncli.utils.get_note_category',
+                 new=mocker.Mock(return_value='test_category'))
+    mocker.patch('nncli.nncli.print')
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'get_note',
+                        new=mocker.Mock(return_value = None))
+    nn_obj.cli_note_dump(1)
+    nncli.nncli.print.assert_not_called()
+    nn_obj.ndb.get_note.assert_called_once_with(1)
+    nncli.utils.get_note_flags.assert_not_called()
+    nncli.utils.get_note_title.assert_not_called()
+    nncli.utils.get_note_category.assert_not_called()
 
 def test_cli_dump_notes(mocker, mock_nncli):
     """test cli_dump_notes"""
@@ -158,13 +178,78 @@ def test_cli_note_create_no_content(mocker, mock_nncli):
     nn_obj.ndb.create_note.assert_not_called()
     nn_obj.ndb.sync_now.assert_not_called()
 
-@pytest.mark.skip
-def test_cli_note_import():
-    pass
+def test_cli_note_import(mocker, mock_nncli):
+    """test cli_note_import"""
+    mocker.patch('nncli.nncli.exec_cmd_on_note',
+                 new=mocker.Mock(return_value='{"content": "test"}'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'import_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_import(False)
+    nncli.nncli.exec_cmd_on_note.assert_called_once()
+    nn_obj.ndb.import_note.assert_called_once_with({'content': 'test'})
+    nn_obj.ndb.sync_now.assert_called_once()
 
-@pytest.mark.skip
-def test_cli_note_export():
-    pass
+def test_cli_note_import_from_stdin(mocker, mock_nncli):
+    """test cli_note_import"""
+    mocker.patch('sys.stdin',
+                 new=StringIO('{"content": "test"}'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'import_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_import(True)
+    nn_obj.ndb.import_note.assert_called_once_with({'content': 'test'})
+    nn_obj.ndb.sync_now.assert_called_once()
+
+def test_cli_note_import_json_error(mocker, mock_nncli):
+    """test cli_note_import failure at json decode"""
+    mocker.patch('nncli.nncli.exec_cmd_on_note',
+                 new=mocker.Mock(return_value='{"content", "test"}'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'import_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    with pytest.raises(SystemExit):
+        nn_obj.cli_note_import(False)
+    nncli.nncli.exec_cmd_on_note.assert_called_once()
+    nn_obj.logger.log.assert_called_once()
+    nn_obj.ndb.import_note.assert_not_called()
+    nn_obj.ndb.sync_now.assert_not_called()
+
+def test_cli_note_import_value_error(mocker, mock_nncli):
+    """test cli_note_import failure"""
+    mocker.patch('nncli.nncli.exec_cmd_on_note',
+                 new=mocker.Mock(return_value='{"content": "test"}'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'import_note',
+                        new=mocker.Mock(side_effect=ValueError))
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    with pytest.raises(SystemExit):
+        nn_obj.cli_note_import(False)
+    nncli.nncli.exec_cmd_on_note.assert_called_once()
+    assert nn_obj.logger.log.call_count == 2
+    nn_obj.ndb.import_note.assert_called_once()
+    nn_obj.ndb.sync_now.assert_not_called()
+
+def test_cli_note_export(mocker, mock_nncli):
+    """test exporting a note as raw JSON"""
+    mocker.patch('nncli.nncli.print')
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'get_note',
+                        new=mocker.Mock(return_value={'content': 'test'}))
+    nn_obj.cli_note_export(1)
+    nn_obj.ndb.get_note.assert_called_once_with(1)
+    nncli.nncli.print.assert_called_once()
+
+def test_cli_note_export_no_note(mocker, mock_nncli):
+    """test failed note export (key not in DB)"""
+    mocker.patch('nncli.nncli.print')
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'get_note',
+                        new=mocker.Mock(return_value=None))
+    nn_obj.cli_note_export(1)
+    nn_obj.ndb.get_note.assert_called_once_with(1)
+    nn_obj.logger.log.assert_called_once()
+    nncli.nncli.print.assert_not_called()
 
 @pytest.mark.skip
 def test_cli_export_notes():
