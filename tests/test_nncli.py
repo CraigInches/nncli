@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """tests for nncli module"""
+from io import StringIO
 import logging
 import os
 import pytest
@@ -101,6 +102,7 @@ def test_cli_note_dump(mocker, mock_nncli):
     nncli.utils.get_note_category.assert_called_once_with(test_note)
 
 def test_cli_dump_notes(mocker, mock_nncli):
+    """test cli_dump_notes"""
     test_notes = (
             [nncli.utils.KeyValueObject(key=1,
              note={'key': 1})],
@@ -114,9 +116,47 @@ def test_cli_dump_notes(mocker, mock_nncli):
     nn_obj.cli_dump_notes(False, 'test_search_string')
     nn_obj.cli_note_dump.assert_called_once_with(1)
 
-@pytest.mark.skip
-def test_cli_note_create():
-    pass
+def test_cli_note_create(mocker, mock_nncli):
+    """test cli_note_create"""
+    mocker.patch('nncli.nncli.exec_cmd_on_note',
+                 new=mocker.Mock(return_value='test content'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'create_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_create(False, 'test title')
+    nncli.nncli.exec_cmd_on_note.assert_called_once()
+    nn_obj.ndb.create_note.assert_called_once_with('test title\n\ntest content')
+    nn_obj.ndb.sync_now.assert_called_once()
+
+def test_cli_note_create_from_stdin(mocker, mock_nncli):
+    """test cli_note_create reading from stdin"""
+    mocker.patch('sys.stdin', new=StringIO('test content'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'create_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_create(True, 'test title')
+    nn_obj.ndb.create_note.assert_called_once_with('test title\n\ntest content')
+    nn_obj.ndb.sync_now.assert_called_once()
+
+def test_cli_note_create_no_title(mocker, mock_nncli):
+    """test cli_note_create without a title"""
+    mocker.patch('sys.stdin', new=StringIO('test content'))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'create_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_create(True, None)
+    nn_obj.ndb.create_note.assert_called_once_with('test content')
+    nn_obj.ndb.sync_now.assert_called_once()
+
+def test_cli_note_create_no_content(mocker, mock_nncli):
+    """test failed cli_note_create without content"""
+    mocker.patch('sys.stdin', new=StringIO(None))
+    nn_obj = nncli.nncli.Nncli(False)
+    mocker.patch.object(nn_obj.ndb, 'create_note')
+    mocker.patch.object(nn_obj.ndb, 'sync_now')
+    nn_obj.cli_note_create(True, None)
+    nn_obj.ndb.create_note.assert_not_called()
+    nn_obj.ndb.sync_now.assert_not_called()
 
 @pytest.mark.skip
 def test_cli_note_import():
