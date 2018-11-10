@@ -430,7 +430,7 @@ class NotesDB():
         # record that we saved this to disc.
         note['savedate'] = int(time.time())
 
-    def _sync_notes(self, server_sync=True, full_sync=True):
+    def sync_notes(self, server_sync=True, full_sync=True):
         """Perform a full bi-directional sync with server.
 
         Psuedo-code algorithm for syncing:
@@ -685,7 +685,7 @@ class NotesDB():
     def sync_now(self, do_server_sync=True):
         """Sync the notes to the server"""
         self.sync_lock.acquire()
-        self._sync_notes(server_sync=do_server_sync,
+        self.sync_notes(server_sync=do_server_sync,
                          full_sync=True if not self.last_sync else False)
         self.sync_lock.release()
 

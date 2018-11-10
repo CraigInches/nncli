@@ -227,7 +227,7 @@ def main(ctx, nosync, verbose, config, key):
     if ctx.invoked_subcommand is None:
         ctx.obj.gui(key)
     elif not nosync:
-        ctx.obj.sync_notes()
+        ctx.obj.ndb.sync_notes()
 
 main.add_command(create)
 main.add_command(edit)
