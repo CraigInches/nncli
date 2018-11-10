@@ -631,15 +631,15 @@ class NotesDB():
 
         # sync done, now write changes to db_path
 
-        for k in list(local_updates.keys()):
+        for key in list(local_updates.keys()):
             try:
-                self._helper_save_note(k, self.notes[k])
+                self._helper_save_note(key, self.notes[key])
             except WriteError as ex:
                 raise WriteError(str(ex))
             self.log("Saved note to disk (key={0})".format(key))
 
-        for k in list(local_deletes.keys()):
-            fnote = self._helper_key_to_fname(k)
+        for key in list(local_deletes.keys()):
+            fnote = self._helper_key_to_fname(key)
             if os.path.exists(fnote):
                 os.unlink(fnote)
                 self.log("Deleted note from disk (key={0})".format(key))
@@ -686,7 +686,7 @@ class NotesDB():
         """Sync the notes to the server"""
         self.sync_lock.acquire()
         self.sync_notes(server_sync=do_server_sync,
-                         full_sync=True if not self.last_sync else False)
+                        full_sync=True if not self.last_sync else False)
         self.sync_lock.release()
 
     def sync_worker(self, do_server_sync):
