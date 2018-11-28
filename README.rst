@@ -111,6 +111,18 @@ Pull requests are welcome, preferably via emailed output of ``git
 request-pull`` sent to the maintainer (see here_ for more information).
 Bug reports should also be directed to the maintainer via email.
 
+Releases
+--------
+
+Release tags will always be signed with the maintainer's `PGP key`_
+(also available on any public keyserver_).  PGP-signed versions of
+release tarballs and pre-built wheel_ packages are available on PyPI_,
+with the signature files living alongside the corresponding artifact
+(simply append an ``.asc`` extension). Because the maintainers of PyPI
+do not consider PGP signatures to be a user-facing feature, the
+extension must be added manually in your browser's URL bar in order to
+download the signature files.
+
 Acknowledgements
 ----------------
 
@@ -127,3 +139,7 @@ Schauenberg and the notes_db.py module from nvpy_ by Charl P. Botha.
 .. _nvpy: https://github.com/cpbotha/nvpy
 .. _Flit: https://flit.readthedocs.io
 .. _here: https://www.git-scm.com/docs/git-request-pull
+.. _PGP key: https://www.danielmoch.com/static/gpg.asc
+.. _wheel: https://pythonwheels.com/
+.. _PyPI: https://pypi.org/project/nncli/
+.. _keyserver: https://pgp.mit.edu/pks/lookup?op=get&search=0x323C9F1784BDDD43
