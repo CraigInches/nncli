@@ -104,6 +104,12 @@ Features
 
   - view and edit note category
 
+Contributing
+------------
+
+Pull requests are welcome, preferably via emailed output of ``git
+request-pull`` sent to the maintainer (see here_ for more information).
+
 Acknowledgements
 ----------------
 
