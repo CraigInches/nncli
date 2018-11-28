@@ -182,7 +182,7 @@ class NncliGui:
                                          handle_mouse=False)
 
         self.nncli_loop.set_alarm_in(0, self._gui_init_view, \
-                True if key else False)
+                bool(key))
 
     def run(self):
         """Run the GUI"""
@@ -316,8 +316,7 @@ class NncliGui:
         self._gui_body_focus()
         self.master_frame.keypress = self._gui_frame_keypress
         args[0](args[1],
-                True if yes_no in ['YES', 'Yes', 'yes', 'Y', 'y'] \
-                        else False
+                yes_no in ['YES', 'Yes', 'yes', 'Y', 'y']
                 )
 
     def _gui_search_input(self, args, search_string):

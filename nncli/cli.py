@@ -5,6 +5,8 @@ import click
 from . import __version__
 from .nncli import Nncli
 
+# pylint: disable=unnecessary-pass
+
 class StdinFlag(click.ParamType):
     """StdinFlag Click Parameter Type"""
     name = "stdin_flag"

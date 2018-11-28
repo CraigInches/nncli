@@ -14,6 +14,7 @@ from .nextcloud_note import NextcloudNote
 
 # pylint: disable=too-many-instance-attributes, too-many-locals
 # pylint: disable=too-many-branches, too-many-statements
+# pylint: disable=unnecessary-pass
 class ReadError(RuntimeError):
     """Exception thrown on a read error"""
     pass
@@ -686,7 +687,7 @@ class NotesDB():
         """Sync the notes to the server"""
         self.sync_lock.acquire()
         self.sync_notes(server_sync=do_server_sync,
-                        full_sync=True if not self.last_sync else False)
+                        full_sync=not bool(self.last_sync))
         self.sync_lock.release()
 
     def sync_worker(self, do_server_sync):
