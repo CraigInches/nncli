@@ -1,0 +1,3 @@
+- Create a proper groff manual
+- Address duplicate code (pylint finding)
+- Target 80% unit test coverage
