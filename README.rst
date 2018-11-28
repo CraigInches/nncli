@@ -8,7 +8,7 @@ Notes can be viewed/created/edited in *both an* **online** *and*
 **offline** *mode*. All changes are saved to a local cache on disk and
 automatically sync'ed when nncli is brought online.
 
-More detailed documentation can be found in the docs.
+More detailed documentation can be found at the homepage_.
 
 Requirements
 ------------
@@ -118,6 +118,7 @@ nncli is a fork of sncli_ by Eric Davis. This application further pulls
 in and uses modified versions of the simplenote.py_ module by Daniel
 Schauenberg and the notes_db.py module from nvpy_ by Charl P. Botha.
 
+.. _homepage: https://nncli.org
 .. _sncli: https://github.com/insanum/sncli
 .. _Python 3: http://python.org
 .. _Urwid: http://urwid.org
