@@ -109,6 +109,7 @@ Contributing
 
 Pull requests are welcome, preferably via emailed output of ``git
 request-pull`` sent to the maintainer (see here_ for more information).
+Bug reports should also be directed to the maintainer via email.
 
 Acknowledgements
 ----------------
