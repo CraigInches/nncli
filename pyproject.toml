@@ -6,7 +6,7 @@ build-backend = "flit.buildapi"
 module = "nncli"
 author = "Daniel Moch"
 author-email = "daniel@danielmoch.com"
-home-page = "https://github.com/djmoch/nncli"
+home-page = "https://nncli.org"
 description-file = "README.rst"
 requires = ["urwid", "requests", "appdirs", "click"]
 classifiers = ["License :: OSI Approved :: MIT License",
@@ -18,7 +18,7 @@ classifiers = ["License :: OSI Approved :: MIT License",
 requires-python = ">=3"
 
 [tool.flit.metadata.urls]
-Documentation = "https://nncli.readthedocs.io/en/latest"
+Documentation = "https://nncli.org/en/stable"
 
 [tool.flit.metadata.requires-extra]
 dev = ["pipenv"]

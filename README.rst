@@ -33,7 +33,7 @@ Installation
   - If you don't already have it, install Flit_: ``pip3 install flit``
 
   - Clone this repository to your hard disk: ``git clone
-    https://github.com/djmoch/nncli.git``
+    https://git.danielmoch.com/nncli.git``
 
   - Install nncli: ``flit install --deps production``
 
@@ -107,9 +107,9 @@ Features
 Acknowledgements
 ----------------
 
-nncli is a fork of sncli_ by Eric Davis. This application further pulls in
-and uses modified versions of the simplenote.py_ module by Daniel Schauenberg and
-the notes_db.py module from nvpy_ by Charl P. Botha.
+nncli is a fork of sncli_ by Eric Davis. This application further pulls
+in and uses modified versions of the simplenote.py_ module by Daniel
+Schauenberg and the notes_db.py module from nvpy_ by Charl P. Botha.
 
 .. _sncli: https://github.com/insanum/sncli
 .. _Python 3: http://python.org
@@ -118,3 +118,4 @@ the notes_db.py module from nvpy_ by Charl P. Botha.
 .. _simplenote.py: https://github.com/mrtazz/simplenote.py
 .. _nvpy: https://github.com/cpbotha/nvpy
 .. _Flit: https://flit.readthedocs.io
+.. _here: https://www.git-scm.com/docs/git-request-pull
