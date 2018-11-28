@@ -107,6 +107,7 @@ Added
 
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
 .. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
+.. _Unreleased: https://git.danielmoch.com/nncli.git/diff/?id=master&id2=v0.3.1
 .. _v0.3.1: https://git.danielmoch.com/nncli.git/diff/?id=v0.3.1&id2=v0.3.0
 .. _v0.3.0: https://git.danielmoch.com/nncli.git/diff/?id=v0.3.0&id2=v0.2.0
 .. _v0.2.0: https://git.danielmoch.com/nncli.git/diff/?id=v0.2.0&id2=v0.1.2
