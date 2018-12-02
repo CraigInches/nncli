@@ -132,7 +132,7 @@ class Config:
                 'clr_help_descr_bg'             : 'default'
         }
 
-        parser = configparser.SafeConfigParser(defaults)
+        parser = configparser.ConfigParser(defaults)
         if custom_file is not None:
             parser.read([custom_file])
         else:
