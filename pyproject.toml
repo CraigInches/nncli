@@ -18,7 +18,7 @@ classifiers = ["License :: OSI Approved :: MIT License",
 requires-python = ">=3"
 
 [tool.flit.metadata.urls]
-Source Code (Git) = "https://git.danielmoch.com"
+"Source Code" = "https://git.danielmoch.com"
 
 [tool.flit.metadata.requires-extra]
 dev = ["pipenv"]
