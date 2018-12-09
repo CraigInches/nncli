@@ -17,9 +17,6 @@ NextCloud Notes Command Line Interface
    .. image:: https://img.shields.io/pypi/v/nncli.svg
       :alt: PyPI
       :target: https://pypi.org/project/nncli
-   .. image:: https://img.shields.io/readthedocs/nncli.svg
-      :alt: Read the Docs
-      :target: https://nncli.readthedocs.io
 
 .. include:: ../../README.rst
 
