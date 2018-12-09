@@ -109,7 +109,10 @@ Contributing
 
 Pull requests are welcome, preferably via emailed output of ``git
 request-pull`` sent to the maintainer (see here_ for more information).
-Bug reports should also be directed to the maintainer via email.
+Bug reports should also be directed to the maintainer via email_.
+
+If you aren't hosting a fork anywhere online, you can also send patches
+using ``git format-patch`` (again, see `the official documentation`_ ).
 
 Releases
 --------
@@ -143,3 +146,5 @@ Schauenberg and the notes_db.py module from nvpy_ by Charl P. Botha.
 .. _wheel: https://pythonwheels.com/
 .. _PyPI: https://pypi.org/project/nncli/
 .. _keyserver: https://pgp.mit.edu/pks/lookup?op=get&search=0x323C9F1784BDDD43
+.. _email: daniel@danielmoch.com
+.. _the official documentation: https://www.git-scm.com/docs/git-format-patch
