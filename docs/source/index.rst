@@ -11,7 +11,7 @@ NextCloud Notes Command Line Interface
    .. image:: https://img.shields.io/pypi/l/nncli.svg
       :alt: PyPI - License
       :target: https://git.danielmoch.com/nncli.git/tree/LICENSE
-   .. image:: https://builds.danielmoch.com/badges/nncli.svg?left_text=build
+   .. image:: https://builds.danielmoch.com/badges/nncli.svg
       :alt: Daniel Moch CI
       :target: https://builds.danielmoch.com/#/builders/nncli
    .. image:: https://img.shields.io/pypi/v/nncli.svg
