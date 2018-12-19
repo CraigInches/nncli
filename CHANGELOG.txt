@@ -67,10 +67,10 @@ v0.1.0 – 2018-07-31
 
 [1] -  https://keepachangelog.com/en/1.0.0/
 [2] -  https://semver.org/spec/v2.0.0.html
-[3] -  https://git.danielmoch.com/nncli.git/diff/?id=master&id2=v0.3.2
-[4] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.3.2&id2=v0.3.1
-[5] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.3.1&id2=v0.3.0
-[6] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.3.0&id2=v0.2.0
-[7] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.2.0&id2=v0.1.2
-[8] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.1.2&id2=v0.1.1
-[9] -  https://git.danielmoch.com/nncli.git/diff/?id=v0.1.1&id2=v0.1.0
+[3] -  https://git.danielmoch.com/nncli/diff/?id=master&id2=v0.3.2
+[4] -  https://git.danielmoch.com/nncli/diff/?id=v0.3.2&id2=v0.3.1
+[5] -  https://git.danielmoch.com/nncli/diff/?id=v0.3.1&id2=v0.3.0
+[6] -  https://git.danielmoch.com/nncli/diff/?id=v0.3.0&id2=v0.2.0
+[7] -  https://git.danielmoch.com/nncli/diff/?id=v0.2.0&id2=v0.1.2
+[8] -  https://git.danielmoch.com/nncli/diff/?id=v0.1.2&id2=v0.1.1
+[9] -  https://git.danielmoch.com/nncli/diff/?id=v0.1.1&id2=v0.1.0
