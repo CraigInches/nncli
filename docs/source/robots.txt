@@ -1,4 +1,4 @@
-Sitemap: https://danielmoch.com/sitemap.xml
+Sitemap: https://nncli.org/sitemap.xml
 
 User-Agent: *
 Host: nncli.org
