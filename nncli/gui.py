@@ -897,8 +897,7 @@ class NncliGui:
             self._gui_footer_log_clear()
             self.logs = []
         else:
-            # for some reason having problems with this being empty?
-            if not self.logs:
+            if self.logs:
                 self.logs.pop(0)
 
             log_pile = []
