@@ -79,6 +79,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+html_extra_path = ['robots.txt']
 
 html_baseurl = 'https://nncli.org/'
 
