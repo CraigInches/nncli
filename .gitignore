@@ -7,3 +7,4 @@ MANIFEST
 docs/build/
 .tox
 htmlcov/
+Pipfile.lock
