@@ -9,7 +9,16 @@ Semantic Versioning [2].
 Unreleased [3]
 ----------
 
-v0.3.3 - 2019-02-25 [4]
+v0.3.4 - 2019-03-08 [4]
+-------------------
+Changed
+ - Fix crashing bug in view_log.py
+ - Refactor gui.py based on pylint findings
+
+Removed
+ - Pipfile.lock
+
+v0.3.3 - 2019-02-25 [5]
 -------------------
 Added
 - Documentation
@@ -24,7 +33,7 @@ Changed
 - Reversed test logic in _log_timeout to avoid popping off on an empty
   stack. This bug was leading to fatal crashes.
 
-v0.3.2 – 2018-12-01 [5]
+v0.3.2 – 2018-12-01 [6]
 -------------------
 Added
  - CHANGELOG.rst
@@ -35,7 +44,7 @@ Changed
 - References to Github repo changed to point to git.danielmoch.com
 - Fixed exception in nncli sync
 
-v0.3.1 – 2018-10-30 [6]
+v0.3.1 – 2018-10-30 [7]
 -------------------
 Added
 - Partial unit testing for nncli.py module
@@ -44,7 +53,7 @@ Changed
 - Refactored code (addressing pylint findings)
 - Fixed bad exception handling in Python 3.4
 
-v0.3.0 – 2018-09-07 [7]
+v0.3.0 – 2018-09-07 [8]
 -------------------
 Added
 - Documentation as PDF format
@@ -52,14 +61,14 @@ Added
 Changed
 - Numerous documentation corrections
 
-v0.2.0 – 2018-09-03 [8]
+v0.2.0 – 2018-09-03 [9]
 -------------------
 Added
 - .travis.yml
 - Pytest, tox, et all added to support automated testing
 - Both tox and Travis testing back to Python 3.4
 
-v0.1.2 – 2018-08-30 [9]
+v0.1.2 – 2018-08-30 [10]
 -------------------
 Added
 - Support for --version flag
@@ -67,7 +76,7 @@ Added
 Changed
 - requirements.txt replaced with Pipfile{,.lock}
 
-v0.1.1 – 2018-08-07 [10]
+v0.1.1 – 2018-08-07 [11]
 -------------------
 Added
 - README content included in PyPI
@@ -82,11 +91,12 @@ v0.1.0 – 2018-07-31
 
 [1]  -  https://keepachangelog.com/en/1.0.0/
 [2]  -  https://semver.org/spec/v2.0.0.html
-[3]  -  https://git.danielmoch.com/nncli/diff/?id=master&id2=v0.3.3
-[4]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.3&id2=v0.3.2
-[5]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.2&id2=v0.3.1
-[6]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.1&id2=v0.3.0
-[7]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.0&id2=v0.2.0
-[8]  -  https://git.danielmoch.com/nncli/diff/?id=v0.2.0&id2=v0.1.2
-[9]  -  https://git.danielmoch.com/nncli/diff/?id=v0.1.2&id2=v0.1.1
-[10] -  https://git.danielmoch.com/nncli/diff/?id=v0.1.1&id2=v0.1.0
+[3]  -  https://git.danielmoch.com/nncli/diff/?id=master&id2=v0.3.4
+[4]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.4&id2=v0.3.3
+[5]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.3&id2=v0.3.2
+[6]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.2&id2=v0.3.1
+[7]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.1&id2=v0.3.0
+[8]  -  https://git.danielmoch.com/nncli/diff/?id=v0.3.0&id2=v0.2.0
+[9]  -  https://git.danielmoch.com/nncli/diff/?id=v0.2.0&id2=v0.1.2
+[10] -  https://git.danielmoch.com/nncli/diff/?id=v0.1.2&id2=v0.1.1
+[11] -  https://git.danielmoch.com/nncli/diff/?id=v0.1.1&id2=v0.1.0
