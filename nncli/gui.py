@@ -50,7 +50,7 @@ class NncliGui:
                     }
                     )
 
-        self.view_log = view_log.ViewLog(self.config)
+        self.view_log = view_log.ViewLog(self.config, self.logger)
         self.view_help = view_help.ViewHelp(self.config)
 
         palette = \

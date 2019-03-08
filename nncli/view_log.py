@@ -8,14 +8,15 @@ class ViewLog(urwid.ListBox):
 
     This class defines the urwid view class for the log viewer
     """
-    def __init__(self, config):
+    def __init__(self, config, logger):
         self.config = config
+        self.logger = logger
         super(ViewLog, self).__init__(urwid.SimpleFocusListWalker([]))
 
     def update_log(self):
         """update the log"""
         lines = []
-        with open(self.config.logfile) as logfile:
+        with open(self.logger.logfile) as logfile:
             for line in logfile:
                 lines.append(
                         urwid.AttrMap(urwid.Text(line.rstrip()),
