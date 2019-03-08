@@ -854,9 +854,8 @@ class NncliGui:
             # clear the screen and exit the urwid run loop
             self._gui_clear()
             raise urwid.ExitMainLoop()
-        else:
-            self.log('WARNING: Not all notes saved'
-                     'to disk (wait for sync worker)')
+        self.log('WARNING: Not all notes saved'
+                 'to disk (wait for sync worker)')
 
     def log(self, msg):
         """Log as message, displaying to the user as appropriate"""
