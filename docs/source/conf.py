@@ -20,7 +20,7 @@ import nncli
 # -- Project information -----------------------------------------------------
 
 project = 'nncli'
-copyright = '2018, Daniel Moch'
+copyright = '2018-2019, Daniel Moch'
 author = 'Daniel Moch'
 
 # The short X.Y version
