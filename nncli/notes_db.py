@@ -83,7 +83,7 @@ class NotesDB():
         """Set the update_view method"""
         self.update_view = update_view
 
-    def _filtered_notes_sort(self, filtered_notes, sort_mode='date'):
+    def filtered_notes_sort(self, filtered_notes, sort_mode='date'):
         """Sort filtered note set"""
         if sort_mode == 'date':
             if self.config.get_config('favorite_ontop') == 'yes':
@@ -124,7 +124,7 @@ class NotesDB():
             filtered_notes, match_regexp, active_notes = \
                 self._filter_notes_regex(search_string)
 
-        self._filtered_notes_sort(filtered_notes, sort_mode)
+        self.filtered_notes_sort(filtered_notes, sort_mode)
 
         return filtered_notes, match_regexp, active_notes
 
