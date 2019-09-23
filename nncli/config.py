@@ -37,8 +37,8 @@ class Config:
                 'cfg_format_strftime'   : '%Y/%m/%d',
                 'cfg_format_note_title' : '[%D] %F %-N %T',
                 'cfg_status_bar'        : 'yes',
-                'cfg_editor'            : os.environ['EDITOR'] \
-                        if 'EDITOR' in os.environ else 'vim {fname} +{line}',
+                'cfg_editor'            : os.environ['VISUAL'] \
+                        if 'VISUAL' in os.environ else 'vim {fname} +{line}',
                 'cfg_pager'             : os.environ['PAGER'] \
                         if 'PAGER' in os.environ else 'less -c',
                 'cfg_max_logs'          : '5',
