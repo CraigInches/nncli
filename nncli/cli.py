@@ -194,7 +194,7 @@ def json_import(nncli, from_stdin):
 
 @click.command(short_help="Add a new note.")
 @click.option('-t', '--title', help="Specify the title of note for create.")
-@click.argument('from_stdin', metavar='[-]', type=STDIN_FLAG)
+@click.argument('from_stdin', metavar='[-]', type=STDIN_FLAG, required=False)
 @click.pass_obj
 def create(nncli, title, from_stdin):
     """
