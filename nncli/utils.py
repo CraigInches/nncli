@@ -41,7 +41,7 @@ def exec_cmd_on_note(note, config, gui, logger, cmd=None, raw=False):
             )
     fname = temp.tempfile_name(tfile)
 
-    
+
     focus_position = 0
     if config.state.do_gui:
         try:
