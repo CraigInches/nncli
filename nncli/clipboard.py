@@ -14,21 +14,21 @@ class Clipboard:
         """Defines the copy command based on the contents of $PATH"""
 
         try:
-            subprocess.check_call(['which', 'xsel'], stdout=DEVNULL,
+            subprocess.check_call(['which', 'xsel'], stdout=DEVNULL, \
                     stderr=DEVNULL)
             return 'echo "%s" | xsel -ib'
         except CalledProcessError:
             pass
 
         try:
-            subprocess.check_call(['which', 'pbcopy'], stdout=DEVNULL,
+            subprocess.check_call(['which', 'pbcopy'], stdout=DEVNULL, \
                     stderr=DEVNULL)
             return 'echo "%s" | pbcopy'
         except CalledProcessError:
             pass
 
         try:
-            subprocess.check_call(['which', 'xclip'], stdout=DEVNULL,
+            subprocess.check_call(['which', 'xclip'], stdout=DEVNULL, \
                     stderr=DEVNULL)
             return 'echo "%s" | xclip -selection clipboard'
         except CalledProcessError:
