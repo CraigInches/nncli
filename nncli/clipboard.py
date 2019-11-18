@@ -25,6 +25,12 @@ class Clipboard:
         except CalledProcessError:
             pass
 
+        try:
+            subprocess.check_output(['which', 'xclip'])
+            return 'echo "%s" | xclip -selection clipboard'
+        except CalledProcessError:
+            pass
+
         return None
 
     def copy(self, text):
