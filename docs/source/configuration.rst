@@ -147,8 +147,8 @@ General Options
    values ``{fname}`` and ``{line}`` can be used to specify respectively
    the file name and line number to pass to the command.
 
-   Optional. Default value: ``$EDITOR`` if defined in the user's
-   environment, else ``vim {fname} +{line}``.
+   Optional. Default value: ``$VISUAL`` or ``$EDITOR`` if defined in the
+   user's environment (preferring ``$VISUAL``), else ``vim {fname} +{line}``.
 
 .. confval:: cfg_pager
 

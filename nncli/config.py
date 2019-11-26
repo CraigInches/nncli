@@ -37,8 +37,6 @@ class Config:
                 'cfg_format_strftime'   : '%Y/%m/%d',
                 'cfg_format_note_title' : '[%D] %F %-N %T',
                 'cfg_status_bar'        : 'yes',
-                'cfg_editor'            : os.environ['VISUAL'] \
-                        if 'VISUAL' in os.environ else 'vim {fname} +{line}',
                 'cfg_pager'             : os.environ['PAGER'] \
                         if 'PAGER' in os.environ else 'less -c',
                 'cfg_max_logs'          : '5',
@@ -131,6 +129,13 @@ class Config:
                 'clr_help_descr_fg'             : 'default',
                 'clr_help_descr_bg'             : 'default'
         }
+
+        if 'VISUAL' in os.environ:
+            defaults['cfg_editor'] = os.environ['VISUAL']
+        elif 'EDITOR' in os.environ:
+            defaults['cfg_editor'] = os.environ['EDITOR']
+        else:
+            defaults['cfg_editor'] = 'vim {fname} +{line}'
 
         parser = configparser.ConfigParser(defaults)
         if custom_file is not None:
